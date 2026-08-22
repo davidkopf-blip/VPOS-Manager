@@ -27,3 +27,4 @@ TestResults/
 # Other IDEs
 .idea/
 *.DotSettings.user
+.claude/

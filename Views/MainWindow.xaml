@@ -52,7 +52,8 @@
                         <ToggleSwitch IsOn="{Binding Options.AutomaticDumpEditing, Mode=TwoWay}" />
                     </StackPanel>
 
-                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                    <TextBlock Text="General Settings" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" />
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
                         <!-- Row 1 -->
                         <CheckBox Content="Disable print" IsChecked="{Binding Options.DisablePrint, Mode=TwoWay}" Grid.Column="0" Grid.Row="0" />
                         <CheckBox Content="Disable license check" IsChecked="{Binding Options.DisableLicenseCheck, Mode=TwoWay}" Grid.Column="1" Grid.Row="0" />
@@ -60,14 +61,23 @@
 
                         <!-- Row 2 -->
                         <CheckBox Content="Disable VectronConnect" IsChecked="{Binding Options.DisableVectronConnect, Mode=TwoWay}" Grid.Column="0" Grid.Row="1" />
-                        <CheckBox Content="Placeholder" IsChecked="{Binding Options.Placeholder1, Mode=TwoWay}" Grid.Column="1" Grid.Row="1" />
-                        <CheckBox Content="Placeholder" IsChecked="{Binding Options.Placeholder2, Mode=TwoWay}" Grid.Column="2" Grid.Row="1" />
-
-                        <!-- Row 3 -->
-                        <CheckBox Content="Placeholder" IsChecked="{Binding Options.Placeholder3, Mode=TwoWay}" Grid.Column="0" Grid.Row="2" />
-                        <CheckBox Content="Placeholder" IsChecked="{Binding Options.Placeholder4, Mode=TwoWay}" Grid.Column="1" Grid.Row="2" />
-                        <CheckBox Content="Placeholder" IsChecked="{Binding Options.Placeholder5, Mode=TwoWay}" Grid.Column="2" Grid.Row="2" />
+                        <CheckBox Content="Disable bonVito" IsChecked="{Binding Options.DisableBonVito, Mode=TwoWay}" Grid.Column="1" Grid.Row="1" />
                     </Grid>
+
+                    <TextBlock Text="myVectron" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                        <TextBlock Text="Prod" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                        <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" />
+                        <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <CheckBox Content="mV Username" IsChecked="{Binding Options.MyVectronUsernameEnabled, Mode=TwoWay}" Width="180" />
+                        <TextBox Text="{Binding Options.MyVectronUsername, Mode=TwoWay}" Width="220" PlaceholderText="Username" IsEnabled="{Binding Options.MyVectronUsernameEnabled}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <CheckBox Content="mV Password" IsChecked="{Binding Options.MyVectronPasswordEnabled, Mode=TwoWay}" Width="180" />
+                        <PasswordBox Password="{Binding Options.MyVectronPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.MyVectronPasswordEnabled}" />
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>

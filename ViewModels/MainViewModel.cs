@@ -113,11 +113,12 @@ namespace DumpLoader_2._0.ViewModels
             Options.DisableLicenseCheck = settings.Options.DisableLicenseCheck;
             Options.DisableMyVectron = settings.Options.DisableMyVectron;
             Options.DisableVectronConnect = settings.Options.DisableVectronConnect;
-            Options.Placeholder1 = settings.Options.Placeholder1;
-            Options.Placeholder2 = settings.Options.Placeholder2;
-            Options.Placeholder3 = settings.Options.Placeholder3;
-            Options.Placeholder4 = settings.Options.Placeholder4;
-            Options.Placeholder5 = settings.Options.Placeholder5;
+            Options.DisableBonVito = settings.Options.DisableBonVito;
+            Options.MyVectronUsernameEnabled = settings.Options.MyVectronUsernameEnabled;
+            Options.MyVectronUsername = settings.Options.MyVectronUsername;
+            Options.MyVectronPasswordEnabled = settings.Options.MyVectronPasswordEnabled;
+            Options.MyVectronPassword = settings.Options.MyVectronPassword;
+            Options.IsTestServer = settings.Options.IsTestServer;
 
             // Do not overwrite a dump path that was selected by the user before initialization finished
             if (string.IsNullOrEmpty(SelectedDumpPath))

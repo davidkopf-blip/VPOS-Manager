@@ -1,2 +1,59 @@
-# VPOS-Manager
-A third-party support tool for loading dumps into VPOS PC, managing VPOS sessions, and keeping track of installed VPOS versions. It automates repetitive setup tasks such as disabling printing, license checks, and applying common configuration changes, saving time and streamlining dump analysis.
+# VPOS Manager
+
+A third-party support tool for loading dumps into VPOS PC, managing VPOS sessions, and keeping
+track of installed VPOS versions. It automates repetitive setup tasks such as disabling printing,
+license checks, and applying common configuration changes, saving time and streamlining dump
+analysis.
+
+## Features
+
+**Version management**
+Register any number of installed VPOS PC builds by pointing at their `.exe` once — the version
+number is read straight from the file's own metadata and remembered between sessions.
+
+**Dump loading**
+Pick a `.vpd`/`.VPosDump` file and launch it against any registered version via `/LoadDump`, or
+start a version standalone without a dump.
+
+**VPOS task manager**
+Every VPOS instance launched through the tool is tracked in a live side panel — bring any of them
+to the foreground, stop them, and see stopped ones disappear automatically.
+
+**Automatic dump editing**
+Before loading a dump, VPOS Manager can run it through the third-party VPOS Dump Editor (DIG) and
+apply a chosen set of edits to a working copy — the original dump file is never touched. Available
+toggles:
+- Disable print
+- Disable license check
+- Disable myVectron
+- Disable VectronConnect
+- Disable bonVito
+
+**myVectron overrides**
+Bake a specific myVectron username/password into the dump before launch, and flip a single switch
+to point VectronConnect and myVectron at the Test or Prod server environment.
+
+**Persistence & diagnostics**
+Registered versions, the last-used dump path, and every toggle above are saved between runs.
+Startup errors and key actions are logged to timestamped files for troubleshooting.
+
+## Changelog
+
+### 1.3.0 — myVectron credentials & server selection
+- Added optional myVectron username/password overrides, baked into the dump on load.
+- Added a Prod/Test switch controlling which server environment VectronConnect and myVectron
+  point at.
+- Settings screen reorganized into "General Settings" and "myVectron" sections for clarity.
+
+### 1.2.0 — Automatic dump editing
+- Integrated the third-party VPOS Dump Editor (DIG) into the load pipeline: dumps can now be
+  edited automatically before VPOS starts, always working on a disposable copy.
+- Added toggles to disable print, license checks, myVectron, VectronConnect, and bonVito.
+
+### 1.1.0 — VPOS task manager
+- Added a live panel tracking every VPOS instance started from the tool, with the ability to
+  bring any of them to the front or stop them directly.
+
+### 1.0.0 — Basic dump loading
+- Initial release: register VPOS PC versions, select a dump file, and launch a version against
+  it.

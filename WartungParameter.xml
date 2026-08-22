@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  WartungParameter.xml
+  ============================================================================
+  Referenz aller "Wartung"-Parameter aus dem VPOS Dump Editor (DIG), Tabelle 33.
+
+  Herkunft: aufgezeichnetes Durchklicken der Feldinformationen-Ansicht (Extras >
+  Options... > Anzeige Feldinformationen) im Bereich "Parameter Wartung"
+  (C:\Users\david.kopf\Videos\VPOS\PARAMETER\WARTUNG.mp4), abgeglichen mit
+  C:\Vectron\Dump-Editor\Examples\Parameter.cxml (Parameterformular, ProgId 153).
+
+  Adressierung: jeder Parameter ist ein einzelner Datensatz in Tabelle 33, Ebene 1,
+  Feld 1. Ansprechbar per eXml wie folgt:
+
+    <DirectAccess TableNo="33" PlaneNo="1">
+      <PutData RecPos="{RecPos}" FieldNo="1" Data="{Wert}" />
+    </DirectAccess>
+
+  RecPos entspricht exakt der Nummer aus Parameter.cxml, sofern der Parameter dort
+  gelistet ist (Quelle="cxml"). Parameter mit Quelle="video-neu" sind in der cxml-
+  Referenz nicht enthalten - sie wurden ausschließlich live aus dem Video gelesen;
+  Name und Wertebereich stammen dort direkt aus der Statuszeile des Dump Editors.
+
+  Bei drei Parametern (siehe max_abweichend="true") zeigte das Video einen größeren
+  Wertebereich als die (möglicherweise ältere) cxml-Referenzdatei - vermutlich, weil
+  eine neuere VPOSPROG.DLL geladen war. Der lebend beobachtete Bereich gilt als
+  aktueller; als "max" ist hier trotzdem der cxml-Wert dokumentiert, das Video-Maximum
+  steht zusätzlich im Attribut max_video.
+  ============================================================================
+-->
+<WartungParameter Quelle="Parameter.cxml + WARTUNG.mp4" TableNo="33" PlaneNo="1" FieldNo="1">
+  <!-- Programmieren -->
+  <Parameter RecPos="34" Name="Programmieren Immer erlaubt" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Programmiermodus ist jederzeit zugänglich, unabhängig von sonstigen Zugriffssperren - hebt Berechtigungsprüfungen für die Programmierung auf. -->
+  </Parameter>
+
+  <!-- Anzeige -->
+  <Parameter RecPos="62" Name="Anzeige Rohdaten anzeigen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Zeigt rohe (unformatierte) Tabellendaten in der Programmierung an, statt der aufbereiteten Ansicht. -->
+  </Parameter>
+
+  <!-- Makros -->
+  <Parameter RecPos="89" Name="Makros Fehler anzeigen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Zeigt Fehler aus Makro-Ausführungen an, statt sie stillschweigend zu ignorieren. -->
+  </Parameter>
+
+  <!-- Fehleranzeige -->
+  <Parameter RecPos="135" Name="Fehleranzeige Im Fenster" Minimum="0" Maximum="1" Quelle="cxml" cxml_Menue="Anzeige">
+    <!-- Zeigt Fehlermeldungen in einem eigenen Fenster an, statt nur in der Statuszeile. -->
+  </Parameter>
+
+  <!-- Anzeige -->
+  <Parameter RecPos="177" Name="Anzeige Formulare expandiert" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Formulare (z. B. Konfigurationsformular ProgId 50) werden beim Öffnen vollständig aufgeklappt statt eingeklappt dargestellt. -->
+  </Parameter>
+  <Parameter RecPos="199" Name="Anzeige Hintergrundvorgänge" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Zeigt laufende Hintergrundvorgänge (z. B. Sync-/Sendevorgänge) in der Anzeige an. -->
+  </Parameter>
+  <Parameter RecPos="220" Name="Anzeige Prog./Ber. komplett" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Zeigt Programmier-/Berichtsmenüs vollständig an, auch Einträge ohne Berechtigung (nur ausgegraut statt versteckt). -->
+  </Parameter>
+
+  <!-- Fehleranzeige -->
+  <Parameter RecPos="273" Name="Fehleranzeige Nicht für Netz" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Fehleranzeige wird bei Netzbetrieb unterdrückt (relevant nur für Einzelplatzbetrieb). -->
+  </Parameter>
+
+  <!-- Im Journal erfassen -->
+  <Parameter RecPos="302" Name="Im Journal erfassen Fehler" Minimum="0" Maximum="1" Quelle="cxml" cxml_Menue="Berichte/Journale" max_abweichend="true" max_video="7">
+    <!-- Nimmt Fehler ins Journal auf. -->
+  </Parameter>
+
+  <!-- Senden -->
+  <Parameter RecPos="307" Name="Senden Auch hardwarespez." Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Sendet auch hardwarespezifische Daten mit (z. B. bei Fernwartungs-Uploads). -->
+  </Parameter>
+
+  <!-- Anzeige -->
+  <Parameter RecPos="310" Name="Anzeige Originaltexte" Minimum="0" Maximum="2" Quelle="cxml">
+    <!-- Zeigt interne Originaltexte/Schlüssel statt übersetzter Anzeigetexte - Debug-Hilfe für Uebersetzungen. -->
+  </Parameter>
+  <Parameter RecPos="317" Name="Anzeige Feldinformationen" Minimum="0" Maximum="3" Quelle="cxml">
+    <!-- Zeigt Feld-IDs/-Nummern in der Programmierung an - Grundlage, um TableNo/FieldNo für DirectAccess-Skripte zu ermitteln. -->
+  </Parameter>
+  <Parameter RecPos="318" Name="Anzeige Formate, Drucker..." Minimum="0" Maximum="1" Quelle="cxml" max_abweichend="true" max_video="2">
+    <!-- Steuert, ob Format-/Drucker-Zuordnungen in der Programmierung zusätzlich angezeigt werden. -->
+  </Parameter>
+
+  <!-- Senden -->
+  <Parameter RecPos="323" Name="Senden Auch lokale Daten" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Sendet auch lokal gespeicherte Daten mit, nicht nur die zentral vorgehaltenen. -->
+  </Parameter>
+
+  <!-- Skripte -->
+  <Parameter RecPos="335" Name="Skripte Attrib. nicht kompr." Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Skript-Attribute werden unkomprimiert gespeichert (einfacher zu inspizieren, größerer Speicherbedarf). -->
+  </Parameter>
+
+  <!-- bonVito -->
+  <Parameter RecPos="346" Name="bonVito Verschlüsselung" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Verschlüsselt die Kommunikation mit dem bonVito-Bonusprogramm-Dienst. -->
+  </Parameter>
+  <Parameter RecPos="347" Name="bonVito Debug Meldungen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Zeigt Debug-Meldungen der bonVito-Anbindung an. -->
+  </Parameter>
+
+  <!-- Dynamische Tabellen -->
+  <Parameter RecPos="348" Name="Dynamische Tabellen Größe nicht ändern" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Verhindert automatisches Vergrößern/Anpassen dynamischer Tabellen. -->
+  </Parameter>
+
+  <!-- Drucken -->
+  <Parameter RecPos="350" Name="Drucken Unterdrücken" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Kompletter Druck-Killswitch: unterdrückt jeglichen Ausdruck, unabhängig von Belegtyp/Drucker. -->
+  </Parameter>
+
+  <!-- Programmieren -->
+  <Parameter RecPos="353" Name="Programmieren Tabellen ändern" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Erlaubt das Aendern von Tabellen aus dem Programmiermodus heraus (statt nur über XML-Import/eXml). -->
+  </Parameter>
+
+  <!-- Vectron Commander -->
+  <Parameter RecPos="367" Name="Vectron Commander Ges.Ber. ern. senden" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Sendet den Vectron-Commander-Gesamtbericht bei jedem Lauf erneut, auch wenn er sich nicht geändert hat. -->
+  </Parameter>
+
+  <!-- Berichte im Netz -->
+  <Parameter RecPos="387" Name="Berichte im Netz Simulieren" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Simuliert Netzwerk-Sammelberichte, ohne dass echte Netzwerkkommunikation stattfindet - nützlich zum Testen von Mehrplatzszenarien ohne echtes Netz. -->
+  </Parameter>
+
+  <!-- Programmieren -->
+  <Parameter RecPos="388" Name="Programmieren Temporäre Bediener" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Erlaubt das Anlegen temporärer Bediener direkt aus der Programmierung heraus. -->
+  </Parameter>
+
+  <!-- Drucken -->
+  <Parameter RecPos="396" Name="Drucken Rohdaten drucken" Minimum="0" Maximum="4" Quelle="cxml">
+    <!-- Bestimmt, an welchem Drucker Rohdaten (unformatierte Debug-Ausgaben) gedruckt werden (0 = kein Druck, sonst Druckerprofil-Nr.). -->
+  </Parameter>
+
+  <!-- Überwachung -->
+  <Parameter RecPos="406" Name="Überwachung Eingestellte IP Adr." Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Überwacht, ob sich die eingestellte IP-Adresse der Kasse unerwartet ändert. -->
+  </Parameter>
+
+  <!-- Taskinfos -->
+  <Parameter RecPos="419" Name="Taskinfos Info löschen n. Res." Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Löscht Task-Informationen automatisch nach einem Reset/Neustart. -->
+  </Parameter>
+
+  <!-- Transaktionstabelle -->
+  <Parameter RecPos="426" Name="Transaktionstabelle Verzögert löschen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Verzögert das Löschen abgearbeiteter Einträge der Transaktionstabelle. -->
+  </Parameter>
+
+  <!-- Drucken -->
+  <Parameter RecPos="429" Name="Drucken Kein Druckzwang" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Kasse verlangt keinen betriebsbereiten Drucker mehr, um fortzufahren - kein Blockieren bei fehlendem/gestörtem Drucker. -->
+  </Parameter>
+
+  <!-- Taskinfos -->
+  <Parameter RecPos="431" Name="Taskinfos Zeitraum" Minimum="0" Maximum="255" Quelle="cxml">
+    <!-- Zeitraum (in Zeiteinheiten), über den Task-Informationen (Taskinfos) gesammelt werden. -->
+  </Parameter>
+
+  <!-- Anzeige -->
+  <Parameter RecPos="432" Name="Anzeige Immer updaten" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Erzwingt ein ständiges Neuzeichnen/Aktualisieren der Anzeige - Diagnosehilfe bei Darstellungsfehlern. -->
+  </Parameter>
+
+  <!-- Makros -->
+  <Parameter RecPos="433" Name="Makros Verzögerung" Minimum="0" Maximum="200" Quelle="cxml">
+    <!-- Feste Verzögerung (in ms) zwischen Makroschritten. -->
+  </Parameter>
+
+  <!-- Tischstatus -->
+  <Parameter RecPos="440" Name="Tischstatus Im Journal erfassen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Tischstatusänderungen werden ins Journal aufgenommen. -->
+  </Parameter>
+
+  <!-- Tabelleninfo -->
+  <Parameter RecPos="441" Name="Tabelleninfo Immer erlaubt" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Oeffnet die Tabellenübersicht (Table -&gt; Info) jederzeit, unabhängig von sonstigen Zugriffsrechten. -->
+  </Parameter>
+
+  <!-- Tabelle speichern -->
+  <Parameter RecPos="442" Name="Tabelle speichern Immer erlaubt" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Erlaubt das Speichern einzelner Tabellen (Table -&gt; Save) jederzeit, ohne Rückfrage/Sperre. -->
+  </Parameter>
+
+  <!-- Berichtsarchiv -->
+  <Parameter RecPos="444" Name="Berichtsarchiv Zuvor anzeigen" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Zeigt archivierte Berichte vor dem Öffnen zur Bestätigung an. -->
+  </Parameter>
+
+  <!-- Flash/Dump-Protokoll -->
+  <Parameter RecPos="445" Name="Flash/Dump-Protokoll Datensich. in Speic." Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Sichert Flash-/Dump-Protokolldaten zusätzlich im Arbeitsspeicher. -->
+  </Parameter>
+
+  <!-- Berichtsarchiv -->
+  <Parameter RecPos="447" Name="Berichtsarchiv Als Textdatei" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Speichert archivierte Berichte zusätzlich als Textdatei. -->
+  </Parameter>
+
+  <!-- Test -->
+  <Parameter RecPos="451" Name="Test Max. Task-Laufzeit" Minimum="0" Maximum="50" Quelle="cxml">
+    <!-- Maximale Laufzeit (Sekunden) für einen Testlauf, bevor er automatisch abgebrochen wird. -->
+  </Parameter>
+
+  <!-- Flash/Dump-Protokoll -->
+  <Parameter RecPos="452" Name="Flash/Dump-Protokoll In Datei schreiben" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Schreibt das Flash-/Dump-Protokoll zusätzlich in eine Datei. -->
+  </Parameter>
+
+  <!-- Senden -->
+  <Parameter RecPos="453" Name="Senden Daten komprimieren" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Komprimiert Daten vor dem Senden (spart Bandbreite, kostet CPU-Zeit). -->
+  </Parameter>
+
+  <!-- Netz -->
+  <Parameter RecPos="454" Name="Netz Unterdrücken" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Unterdrückt sämtliche Netzwerkkommunikation der Kasse - genereller Netzwerk-Killswitch. -->
+  </Parameter>
+
+  <!-- Fernwartung -->
+  <Parameter RecPos="455" Name="Fernwartung Icon Bibliot. senden" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Sendet die Icon-Bibliothek bei der Fernwartung mit. -->
+  </Parameter>
+
+  <!-- Skripte -->
+  <Parameter RecPos="462" Name="Skripte Version prüfen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Prüft beim Ausführen eines Skripts, ob dessen Version zur Kassenversion passt. -->
+  </Parameter>
+
+  <!-- Senden -->
+  <Parameter RecPos="463" Name="Senden Stopp im Fehlerfall" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Bricht den Sendevorgang bei einem Fehler sofort ab, statt weiterzuversuchen. -->
+  </Parameter>
+  <Parameter RecPos="464" Name="Senden Socket aufzeichnen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Zeichnet die Socket-/Netzwerkkommunikation beim Senden auf - Diagnosehilfe. -->
+  </Parameter>
+
+  <!-- Makros -->
+  <Parameter RecPos="467" Name="Makros Delays unterdrücken" Minimum="0" Maximum="3" Quelle="cxml">
+    <!-- Unterdrückt konfigurierte Verzögerungen (Delays) innerhalb von Makros (Modus: 0=aus, gestuft schneller). -->
+  </Parameter>
+
+  <!-- Austauschdatei lesen -->
+  <Parameter RecPos="468" Name="Austauschdatei lesen Immer erlaubt" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Erlaubt das Einlesen von Austauschdateien jederzeit, ohne Bestätigungsdialog. -->
+  </Parameter>
+
+  <!-- Im Journal erfassen -->
+  <Parameter RecPos="482" Name="Im Journal erfassen Erfassungsmodus" Minimum="0" Maximum="2" Quelle="cxml">
+    <!-- Erfassungsmodus für Journaleinträge (welche Detailtiefe protokolliert wird). -->
+  </Parameter>
+
+  <!-- Zeitgest. -->
+  <Parameter RecPos="487" Name="Zeitgest. Funktionen Unterdrücken" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Unterdrückt zeitgesteuerte Funktionen/Automatismen (z. B. geplante Aufgaben) komplett. -->
+  </Parameter>
+
+  <!-- Anzeige -->
+  <Parameter RecPos="488" Name="Anzeige Log Netz" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Schreibt ein Protokoll aller Netzwerkaktivität mit (Netz-Log). -->
+  </Parameter>
+
+  <!-- Skripte -->
+  <Parameter RecPos="489" Name="Skripte Neustart b. Fehler" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Startet ein fehlgeschlagenes Skript automatisch neu. -->
+  </Parameter>
+
+  <!-- Fehler -->
+  <Parameter RecPos="490" Name="Fehler Err. Abort: Neustart" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Startet die Kasse nach einem Abbruchfehler automatisch neu. -->
+  </Parameter>
+
+  <!-- Test -->
+  <Parameter RecPos="491" Name="Test Tests erlauben" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Genereller Schalter: erlaubt das Ausführen von Tests auf der Kasse überhaupt erst. -->
+  </Parameter>
+
+  <!-- Drucken -->
+  <Parameter RecPos="492" Name="Drucken Im Journal erfassen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Nimmt Druckvorgänge ins Journal auf. -->
+  </Parameter>
+
+  <!-- Skripte -->
+  <Parameter RecPos="495" Name="Skripte Volle Skript Infos" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Protokolliert ausführliche Diagnoseinformationen zu jeder Skriptausführung. -->
+  </Parameter>
+
+  <!-- Fiskaljournal -->
+  <Parameter RecPos="497" Name="Fiskaljournal Überwachung" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Überwacht das Fiskaljournal auf Unstimmigkeiten/Fehler im Hintergrund. -->
+  </Parameter>
+  <Parameter RecPos="501" Name="Fiskaljournal Ohne Box" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Betreibt das Fiskaljournal ohne die (Hardware-)Box, sofern rechtlich/technisch zulässig. -->
+  </Parameter>
+
+  <!-- Automat. -->
+  <Parameter RecPos="509" Name="Automat. Sicherung Frequenz in Minuten" Minimum="1" Maximum="60" Quelle="cxml">
+    <!-- Intervall (Minuten) zwischen automatischen Sicherungen. -->
+  </Parameter>
+  <Parameter RecPos="510" Name="Automat. Sicherung Passwort" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Schützt automatische Sicherungen mit einem Passwort. -->
+  </Parameter>
+
+  <!-- Kein -->
+  <Parameter RecPos="512" Name="Kein Hintergr.flush Kein Hintergr.flush" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Deaktiviert das periodische Zurückschreiben (Flush) von Daten im Hintergrund. -->
+  </Parameter>
+
+  <!-- Transaktionstabelle -->
+  <Parameter RecPos="514" Name="Transaktionstabelle Netz-Wiederh. -&amp;gt; Jrn" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Bei Netzwiederholung wird der Vorgang zusätzlich ins Journal geschrieben. -->
+  </Parameter>
+  <Parameter RecPos="515" Name="Transaktionstabelle Weiter b. Netzfehler" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Verarbeitung läuft bei Netzfehlern weiter, statt abzubrechen. -->
+  </Parameter>
+  <Parameter RecPos="517" Name="Transaktionstabelle Schnelle Fehleranz." Minimum="0" Maximum="1" Quelle="cxml" max_abweichend="true" max_video="2">
+    <!-- Schnellere/verkürzte Fehleranzeige für Einträge der Transaktionstabelle. -->
+  </Parameter>
+  <Parameter RecPos="518" Name="Transaktionstabelle Bediener 0" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Bediener 0 (Systembediener) wird in der Transaktionstabelle zugelassen/behandelt. -->
+  </Parameter>
+
+  <!-- Hintergrundprotokoll -->
+  <Parameter RecPos="519" Name="Hintergrundprotokoll Fehler ignorieren" Minimum="0" Maximum="255" Quelle="cxml">
+    <!-- Bewahrt Fehler aus dem Hintergrundprotokoll trotz Ignorieren-Einstellung auf (Anzahl Einträge). -->
+  </Parameter>
+
+  <!-- Sperre -->
+  <Parameter RecPos="520" Name="Sperre bei Defekt SRAM" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Sperrt die Kasse bei defektem SRAM-Speicher, statt mit möglicherweise korrupten Daten weiterzulaufen. -->
+  </Parameter>
+
+  <!-- VectronConnect -->
+  <Parameter RecPos="523" Name="VectronConnect Verschlüsselung" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Verschlüsselt die Kommunikation mit VectronConnect. -->
+  </Parameter>
+  <Parameter RecPos="524" Name="VectronConnect Server" Minimum="0" Maximum="2" Quelle="cxml">
+    <!-- Wählt den VectronConnect-Server/-Modus aus (z. B. Produktiv- vs. Testserver). -->
+  </Parameter>
+
+  <!-- Fiskaljournal/Fiskalsystem -->
+  <Parameter RecPos="528" Name="Fiskaljournal/Fiskalsystem Testdaten" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Verwendet Testdaten statt echter Umsatzdaten für das Fiskalsystem (Testbetrieb). -->
+  </Parameter>
+
+  <!-- Dynamische Tabellen -->
+  <Parameter RecPos="541" Name="Dynamische Tabellen Im Journal erfassen" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Aenderungen an dynamischen Tabellen werden zusätzlich ins Journal geschrieben. -->
+  </Parameter>
+
+  <!-- Zum ext.Gerät senden -->
+  <Parameter RecPos="558" Name="Zum ext.Gerät senden Storno" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Sendet Stornos zusätzlich an ein externes Gerät. -->
+  </Parameter>
+
+  <!-- Update p. Webservice -->
+  <Parameter RecPos="560" Name="Update p. Webservice Down. Testwartezeit" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Wartezeit (Testwert) vor einem Download über den Update-Webservice. -->
+  </Parameter>
+
+  <!-- Swipe-Geste -->
+  <Parameter RecPos="562" Name="Swipe-Geste Geschwindigkeit" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Empfindlichkeit/Geschwindigkeit, ab der eine Wischbewegung als Swipe erkannt wird. -->
+  </Parameter>
+  <Parameter RecPos="563" Name="Swipe-Geste Abstand" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Mindestabstand (Distanz), ab dem eine Bewegung als Swipe statt als Tipp gewertet wird. -->
+  </Parameter>
+  <Parameter RecPos="564" Name="Swipe-Geste Swipemodus" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Aktiviert den Swipe-Gesten-Modus für Touch-Eingaben. -->
+  </Parameter>
+
+  <!-- Drucken -->
+  <Parameter RecPos="572" Name="Drucken PDF-Erstellung" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Aktiviert die PDF-Erstellung für Ausdrucke (statt/zusätzlich zu physischem Druck). -->
+  </Parameter>
+
+  <!-- Passwortabfrage -->
+  <Parameter RecPos="573" Name="Passwortabfrage Unterdrücken" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Unterdrückt die Passwortabfrage (z. B. bei geschützten Aktionen) - Vorsicht: hebt eine Sicherheitsschranke auf. -->
+  </Parameter>
+
+  <!-- Wiederherstellungsp. -->
+  <Parameter RecPos="583" Name="Wiederherstellungsp. Automatisch" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Automatische Wiederherstellung nach einem Absturz/Neustart, ohne Rückfrage. -->
+  </Parameter>
+
+  <!-- myVectron Lizenzstatus -->
+  <Parameter RecPos="585" Name="myVectron Lizenzstatus Testintervall" Minimum="0" Maximum="255" Quelle="video-neu">
+    <!-- Testintervall (in Zeiteinheiten) für die Prüfung des myVectron-Lizenzstatus. -->
+  </Parameter>
+
+  <!-- Fiskaljournal/Fiskalsystem -->
+  <Parameter RecPos="587" Name="Fiskaljournal/Fiskalsystem Upload Testwerte" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Lädt Testwerte für das Fiskaljournal probeweise hoch, ohne echte Daten zu übertragen. -->
+  </Parameter>
+
+  <!-- myVectron -->
+  <Parameter RecPos="589" Name="myVectron Server" Minimum="0" Maximum="2" Quelle="video-neu">
+    <!-- Server-Adresse/-Modus für myVectron. -->
+  </Parameter>
+  <Parameter RecPos="590" Name="myVectron Pausieren" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Pausiert die myVectron-Anbindung, ohne sie vollständig zu deaktivieren. -->
+  </Parameter>
+
+  <!-- Zertifikate -->
+  <Parameter RecPos="592" Name="Zertifikate Testintervall (5min)" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Testintervall (Minuten) zur Prüfung der hinterlegten Zertifikate. -->
+  </Parameter>
+  <Parameter RecPos="593" Name="Zertifikate Zertifikate verwend." Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Verwendet Zertifikate für die betreffende Kommunikation (TLS/Signierung) statt unverschlüsselter Verbindung. -->
+  </Parameter>
+
+  <!-- Software-Update -->
+  <Parameter RecPos="597" Name="Software-Update Nummer" Minimum="0" Maximum="185" Quelle="video-neu">
+    <!-- Nummer/Kennung des zu ladenden Software-Updates. -->
+  </Parameter>
+
+  <!-- Digitaler Bon -->
+  <Parameter RecPos="602" Name="Digitaler Bon Timeout" Minimum="0" Maximum="255" Quelle="video-neu">
+    <!-- Timeout (Sekunden) für den digitalen Bon, bevor der Vorgang abgebrochen/verworfen wird. -->
+  </Parameter>
+
+  <!-- Kontext-Touch -->
+  <Parameter RecPos="604" Name="Kontext-Touch Immer erlaubt" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Kontext-Touch (Rechtsklick-Aequivalent per Touch) ist jederzeit erlaubt. -->
+  </Parameter>
+
+  <!-- Fehler -->
+  <Parameter RecPos="605" Name="Fehler Unterdrückter Fehler: Anzeigen" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Zeigt unterdrückte Fehler zusätzlich in einer separaten Übersicht an. -->
+  </Parameter>
+
+  <!-- Nagle Algorithmus -->
+  <Parameter RecPos="606" Name="Nagle Algorithmus Skripte" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus (TCP-Pufferung) für Skript-Verbindungen - reduziert Latenz auf Kosten von mehr kleinen Paketen. -->
+  </Parameter>
+  <Parameter RecPos="607" Name="Nagle Algorithmus Netzkamera" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus für die Netzkamera-Verbindung. -->
+  </Parameter>
+  <Parameter RecPos="608" Name="Nagle Algorithmus Intern" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus für interne Verbindungen. -->
+  </Parameter>
+  <Parameter RecPos="609" Name="Nagle Algorithmus Einfachmodus" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus im Einfachmodus-Betrieb. -->
+  </Parameter>
+  <Parameter RecPos="610" Name="Nagle Algorithmus TSE" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus für TSE-Verbindungen. -->
+  </Parameter>
+  <Parameter RecPos="611" Name="Nagle Algorithmus Server" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus für Server-Verbindungen. -->
+  </Parameter>
+  <Parameter RecPos="612" Name="Nagle Algorithmus TCP/IP Port" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus für die TCP/IP-Port-Verbindung. -->
+  </Parameter>
+  <Parameter RecPos="613" Name="Nagle Algorithmus Lizenzabruf" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Deaktiviert den Nagle-Algorithmus beim Lizenzabruf. -->
+  </Parameter>
+
+  <!-- Fiskaljournal/Fiskalsystem -->
+  <Parameter RecPos="614" Name="Fiskaljournal/Fiskalsystem TSE Backup: Upload Testwerte" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Lädt Testwerte für das TSE-Backup hoch, ohne ein echtes Backup auszulösen. -->
+  </Parameter>
+  <Parameter RecPos="624" Name="Fiskaljournal/Fiskalsystem Keine Einschränkung" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Hebt Einschränkungen des Fiskalsystems auf (z. B. für Testumgebungen). -->
+  </Parameter>
+
+  <!-- Skripte -->
+  <Parameter RecPos="629" Name="Skripte Max. ausgefü. Zeilen" Minimum="0" Maximum="20" Quelle="video-neu">
+    <!-- Maximale Anzahl an Zeilen, die ein Skript pro Ausführung verarbeitet. -->
+  </Parameter>
+
+  <!-- Shift4 -->
+  <Parameter RecPos="630" Name="Shift4 Global Timer" Minimum="0" Maximum="255" Quelle="video-neu">
+    <!-- Globaler Timer-Wert (z. B. Watchdog-Intervall) für Shift4-spezifische Funktionen. -->
+  </Parameter>
+
+  <!-- Kommunikation -->
+  <Parameter RecPos="631" Name="Kommunikation Buchungsspeicherinfo" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Zusätzliche Diagnoseinformationen zum Buchungsspeicher werden mitprotokolliert. -->
+  </Parameter>
+
+  <!-- Skripte -->
+  <Parameter RecPos="632" Name="Skripte Remote- als HG-Term." Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Remote-Anfragen werden wie ein Hintergrundterminal behandelt. -->
+  </Parameter>
+
+  <!-- Fiskaljournal/Fiskalsystem -->
+  <Parameter RecPos="633" Name="Fiskaljournal/Fiskalsystem Berichtsarchiv: Upload Testwerte" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Lädt Testwerte für das Berichtsarchiv hoch, ohne reale Archivdaten zu erzeugen. -->
+  </Parameter>
+
+  <!-- Produkt Aktivierung -->
+  <Parameter RecPos="634" Name="Produkt Aktivierung Testintervall" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Testintervall für die Produktaktivierungsprüfung. -->
+  </Parameter>
+
+  <!-- Anzeige -->
+  <Parameter RecPos="635" Name="Anzeige Automa. Formatierung" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Automatische Formatierung von Eingaben/Anzeige (z. B. Zahlenformate) an/aus. -->
+  </Parameter>
+
+  <!-- Programmieren -->
+  <Parameter RecPos="640" Name="Programmieren Druck ohne Feldnamen" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Druckt Programmierdaten ohne die zugehörigen Feldnamen (kompaktere Ausdrucke). -->
+  </Parameter>
+
+  <!-- TSE -->
+  <Parameter RecPos="641" Name="TSE Fehler ignorieren" Minimum="0" Maximum="255" Quelle="video-neu">
+    <!-- Ignoriert Fehler der TSE (Technische Sicherheitseinrichtung) - Vorsicht: nur für Testzwecke, nicht für den Produktivbetrieb gedacht. -->
+  </Parameter>
+
+  <!-- Transaktionstabelle -->
+  <Parameter RecPos="646" Name="Transaktionstabelle Keine Verarbeitung: Abbruchfehler" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Bei Abbruchfehler wird der Datensatz nicht weiterverarbeitet (Sicherheitsstopp statt automatischem Retry). -->
+  </Parameter>
+</WartungParameter>

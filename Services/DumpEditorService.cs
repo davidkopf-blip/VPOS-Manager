@@ -107,6 +107,30 @@ namespace DumpLoader_2._0.Services
                 root.Add(DirectAccess("695", "1", "1", "1", "0"));
             }
 
+            if (options.DisableBonVito)
+            {
+                root.Add(new XComment(" Disable bonVito "));
+                root.Add(DirectAccess("532", "1", "1", "8", "0"));
+            }
+
+            if (options.MyVectronUsernameEnabled)
+            {
+                root.Add(new XComment(" myVectron Username "));
+                root.Add(DirectAccess("1021", "1", "1", "1", options.MyVectronUsername ?? string.Empty));
+            }
+
+            if (options.MyVectronPasswordEnabled)
+            {
+                root.Add(new XComment(" myVectron Password "));
+                root.Add(DirectAccess("1021", "1", "1", "2", options.MyVectronPassword ?? string.Empty));
+            }
+
+            // Always applied (not opt-in): selects Prod vs. Test server for VectronConnect/myVectron.
+            var serverValue = options.IsTestServer ? "1" : "0";
+            root.Add(new XComment(options.IsTestServer ? " Server-Umgebung: Test " : " Server-Umgebung: Prod "));
+            root.Add(DirectAccess("33", "1", "524", "1", serverValue));
+            root.Add(DirectAccess("33", "1", "589", "1", serverValue));
+
             var doc = new XDocument(new XDeclaration("1.0", "utf-8", null), root);
             using var writer = new StreamWriter(SupportXmlPath, false, new UTF8Encoding(false));
             doc.Save(writer);
