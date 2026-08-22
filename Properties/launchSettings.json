@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DumpLoader 2.0 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "DumpLoader 2.0 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

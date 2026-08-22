@@ -1,0 +1,29 @@
+# .NET / Visual Studio build output
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# MSIX / WinUI packaging output
+AppPackages/
+BundleArtifacts/
+*.appx
+*.appxbundle
+*.appxsym
+*.appxupload
+*.msix
+*.msixbundle
+*.cer
+
+# Signing keys - never commit private keys, even to a private repo
+*.pfx
+*.snk
+
+# Publish output
+**/publish/
+TestResults/
+
+# Other IDEs
+.idea/
+*.DotSettings.user
