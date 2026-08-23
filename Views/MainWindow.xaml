@@ -14,89 +14,100 @@
 
     <Grid Background="{StaticResource WindowBackground}" RowDefinitions="Auto,*" RequestedTheme="Dark">
 
-        <MenuBar Grid.Row="0" Background="{StaticResource CardBackground}">
-            <MenuBarItem Title="Settings">
-                <MenuFlyoutItem Text="Open Settings..." Click="SettingsMenuItem_Click" />
-            </MenuBarItem>
-            <MenuBarItem Title="Help">
-                <MenuFlyoutItem Text="About VPOS Manager" Click="AboutMenuItem_Click" />
-            </MenuBarItem>
-        </MenuBar>
-
-    <Grid Grid.Row="1" Padding="24" ColumnDefinitions="*,340">
-        <Grid Grid.Column="0" RowDefinitions="Auto,24,Auto" ColumnDefinitions="*">
-            <!-- Section 1 Card -->
-            <Border Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="Versions" Foreground="{StaticResource PrimaryText}" FontSize="18" FontWeight="SemiBold" />
-
-                    <!-- Row 1 -->
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <ComboBox x:Name="VersionsComboBox" Width="220" ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}" DisplayMemberPath="Version" />
-                        <Button x:Name="AddVersionButton" Content="Add Version" Click="AddVersionButton_Click" Style="{StaticResource PrimaryButtonStyle}" />
-                    </StackPanel>
-
-                    <!-- Row 2 -->
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox x:Name="DumpPathTextBox" Text="{Binding SelectedDumpPath, Mode=TwoWay}" Width="600" PlaceholderText="No dump selected" IsReadOnly="True" />
-                        <Button x:Name="SelectDumpButton" Content="Select Dump" Click="SelectDumpButton_Click" />
-                    </StackPanel>
-
-                    <!-- Row 3 -->
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                        <Button x:Name="StartVposButton" Grid.Column="0" Click="StartVposButton_Click" Height="48" Background="#00C853" Foreground="White" FontWeight="SemiBold" Content="Load Dump and Start VPOS" HorizontalAlignment="Stretch" BorderThickness="0" CornerRadius="4" />
-                        <Button x:Name="StartVposOnlyButton" Grid.Column="1" Click="StartVposOnlyButton_Click" Height="48" Content="Start VPOS" HorizontalAlignment="Stretch" />
-                    </Grid>
-                </StackPanel>
-            </Border>
-
-            <!-- Separator -->
-            <Grid Grid.Row="1">
-                <Rectangle Height="1" Fill="#333" VerticalAlignment="Center" />
-            </Grid>
-
-            <!-- Section 2 Card -->
-            <Border Grid.Row="2" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16">
-                <StackPanel Spacing="12">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
-                        <TextBlock Text="Automatic Dump Editing" Foreground="{StaticResource PrimaryText}" VerticalAlignment="Center" />
-                        <ToggleSwitch IsOn="{Binding Options.AutomaticDumpEditing, Mode=TwoWay}" />
-                    </StackPanel>
-
-                    <TextBlock Text="General Settings" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" />
-                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
-                        <!-- Row 1 -->
-                        <CheckBox Content="Disable print" IsChecked="{Binding Options.DisablePrint, Mode=TwoWay}" Grid.Column="0" Grid.Row="0" />
-                        <CheckBox Content="Disable license check" IsChecked="{Binding Options.DisableLicenseCheck, Mode=TwoWay}" Grid.Column="1" Grid.Row="0" />
-                        <CheckBox Content="Disable myVectron" IsChecked="{Binding Options.DisableMyVectron, Mode=TwoWay}" Grid.Column="2" Grid.Row="0" />
-
-                        <!-- Row 2 -->
-                        <CheckBox Content="Disable VectronConnect" IsChecked="{Binding Options.DisableVectronConnect, Mode=TwoWay}" Grid.Column="0" Grid.Row="1" />
-                        <CheckBox Content="Disable bonVito" IsChecked="{Binding Options.DisableBonVito, Mode=TwoWay}" Grid.Column="1" Grid.Row="1" />
-                    </Grid>
-
-                    <TextBlock Text="myVectron" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" />
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
-                        <TextBlock Text="Prod" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
-                        <StackPanel Orientation="Horizontal" Spacing="0">
-                            <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" />
-                            <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="-8,0,0,0" />
-                        </StackPanel>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <CheckBox Content="mV Username" IsChecked="{Binding Options.MyVectronUsernameEnabled, Mode=TwoWay}" Width="180" />
-                        <TextBox x:Name="MyVectronUsernameTextBox" Text="{Binding Options.MyVectronUsername, Mode=TwoWay}" Width="220" PlaceholderText="Username" IsEnabled="{Binding Options.MyVectronUsernameEnabled}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <CheckBox Content="mV Password" IsChecked="{Binding Options.MyVectronPasswordEnabled, Mode=TwoWay}" Width="180" />
-                        <PasswordBox x:Name="MyVectronPasswordBox" Password="{Binding Options.MyVectronPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.MyVectronPasswordEnabled}" />
-                    </StackPanel>
-                    <CheckBox x:Name="SaveCredentialsCheckBox" Content="Save Username &amp; Password" IsChecked="{Binding Options.SaveMyVectronCredentials, Mode=TwoWay}" Click="SaveCredentialsCheckBox_Click" />
-                </StackPanel>
-            </Border>
+        <!-- Custom title bar: replaces the native white caption area. Set as the drag region via
+             Window.SetTitleBar in code-behind; OS min/max/close glyphs are recolored to render
+             directly on top of this bar (see MainWindow.xaml.cs). -->
+        <Grid x:Name="AppTitleBar" Grid.Row="0" Height="40" Background="{StaticResource CardBackground}" ColumnDefinitions="Auto,*">
+            <TextBlock Grid.Column="0" Text="VPOS Manager" Foreground="{StaticResource SecondaryText}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,24,0" />
+            <MenuBar Grid.Column="1" Background="Transparent" VerticalAlignment="Center">
+                <MenuBarItem Title="Settings">
+                    <MenuFlyoutItem Text="Open Settings..." Click="SettingsMenuItem_Click" />
+                </MenuBarItem>
+                <MenuBarItem Title="Help">
+                    <MenuFlyoutItem Text="About VPOS Manager" Click="AboutMenuItem_Click" />
+                </MenuBarItem>
+            </MenuBar>
         </Grid>
 
-        <views:RunningProcessesPanel Grid.Column="1" />
-    </Grid>
+        <Grid Grid.Row="1" Padding="24" ColumnDefinitions="*,340" ColumnSpacing="24">
+            <Grid Grid.Column="0" RowDefinitions="Auto,24,Auto" ColumnDefinitions="*">
+                <!-- Section 1 Card -->
+                <Border Background="{StaticResource CardBackground}" CornerRadius="12" Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Versions" Foreground="{StaticResource PrimaryText}" FontSize="18" FontWeight="SemiBold" />
+
+                        <!-- Row 1 -->
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ComboBox x:Name="VersionsComboBox" Width="220" ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}" DisplayMemberPath="Version" />
+                            <Button x:Name="AddVersionButton" Content="Add Version" Click="AddVersionButton_Click" />
+                        </StackPanel>
+
+                        <!-- Row 2 -->
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox x:Name="DumpPathTextBox" Text="{Binding SelectedDumpPath, Mode=TwoWay}" Width="600" PlaceholderText="No dump selected" IsReadOnly="True" />
+                            <Button x:Name="SelectDumpButton" Content="Select Dump" Click="SelectDumpButton_Click" />
+                        </StackPanel>
+
+                        <!-- Row 3 -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button x:Name="StartVposButton" Grid.Column="0" Click="StartVposButton_Click" Content="Load Dump and Start VPOS" HorizontalAlignment="Stretch" Style="{StaticResource LargePrimaryButtonStyle}" />
+                            <Button x:Name="StartVposOnlyButton" Grid.Column="1" Click="StartVposOnlyButton_Click" Content="Start VPOS" HorizontalAlignment="Stretch" Style="{StaticResource LargeButtonStyle}" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Section 2 Card -->
+                <Border Grid.Row="2" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="20">
+                    <StackPanel Spacing="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Automatic Dump Editing" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <ToggleSwitch Grid.Column="1" IsOn="{Binding Options.AutomaticDumpEditing, Mode=TwoWay}" OnContent="" OffContent="" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{StaticResource HairlineBrush}" />
+
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="GENERAL SETTINGS" Style="{StaticResource SectionLabelStyle}" />
+                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                                <!-- Row 1 -->
+                                <CheckBox Content="Disable print" IsChecked="{Binding Options.DisablePrint, Mode=TwoWay}" Grid.Column="0" Grid.Row="0" />
+                                <CheckBox Content="Disable license check" IsChecked="{Binding Options.DisableLicenseCheck, Mode=TwoWay}" Grid.Column="1" Grid.Row="0" />
+                                <CheckBox Content="Disable myVectron" IsChecked="{Binding Options.DisableMyVectron, Mode=TwoWay}" Grid.Column="2" Grid.Row="0" />
+
+                                <!-- Row 2 -->
+                                <CheckBox Content="Disable VectronConnect" IsChecked="{Binding Options.DisableVectronConnect, Mode=TwoWay}" Grid.Column="0" Grid.Row="1" />
+                                <CheckBox Content="Disable bonVito" IsChecked="{Binding Options.DisableBonVito, Mode=TwoWay}" Grid.Column="1" Grid.Row="1" />
+                            </Grid>
+                        </StackPanel>
+
+                        <Rectangle Height="1" Fill="{StaticResource HairlineBrush}" />
+
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="MYVECTRON" Style="{StaticResource SectionLabelStyle}" />
+
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                                <TextBlock Text="Prod" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" Spacing="0">
+                                    <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" />
+                                    <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="-8,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <CheckBox Content="mV Username" IsChecked="{Binding Options.MyVectronUsernameEnabled, Mode=TwoWay}" Width="168" />
+                                <TextBox x:Name="MyVectronUsernameTextBox" Text="{Binding Options.MyVectronUsername, Mode=TwoWay}" Width="220" PlaceholderText="Username" IsEnabled="{Binding Options.MyVectronUsernameEnabled}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <CheckBox Content="mV Password" IsChecked="{Binding Options.MyVectronPasswordEnabled, Mode=TwoWay}" Width="168" />
+                                <PasswordBox x:Name="MyVectronPasswordBox" Password="{Binding Options.MyVectronPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.MyVectronPasswordEnabled}" />
+                            </StackPanel>
+                            <CheckBox x:Name="SaveCredentialsCheckBox" Content="Save Username &amp; Password" IsChecked="{Binding Options.SaveMyVectronCredentials, Mode=TwoWay}" Click="SaveCredentialsCheckBox_Click" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <views:RunningProcessesPanel Grid.Column="1" />
+        </Grid>
     </Grid>
 </Window>

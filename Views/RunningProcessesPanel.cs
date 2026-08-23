@@ -1,57 +1,96 @@
 using System;
 using System.Collections.Specialized;
 using System.Linq;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Windows.UI;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Text;
+using Microsoft.UI.Xaml.Shapes;
 using DumpLoader_2._0.ViewModels;
 
 namespace DumpLoader_2._0.Views
 {
     public sealed partial class RunningProcessesPanel : UserControl
     {
-        private StackPanel _itemsHost = new StackPanel();
+        private StackPanel _itemsHost = new StackPanel { Spacing = 10 };
         private TextBlock _emptyText;
+        private Border _countBadge;
+        private TextBlock _countText;
         private MainViewModel? _vm;
 
         public RunningProcessesPanel()
         {
+            var accent = (SolidColorBrush)Application.Current.Resources["PrimaryAccent"];
+            var primaryText = (SolidColorBrush)Application.Current.Resources["PrimaryText"];
+            var secondaryText = (SolidColorBrush)Application.Current.Resources["SecondaryText"];
+
             var border = new Border
             {
                 Background = (SolidColorBrush)Application.Current.Resources["CardBackground"],
+                BorderBrush = new SolidColorBrush(Color.FromArgb(0x0D, 0xFF, 0xFF, 0xFF)),
+                BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(12),
-                Padding = new Thickness(16),
-                Margin = new Thickness(12, 0, 0, 0)
+                Padding = new Thickness(20),
             };
 
-            var root = new StackPanel();
+            var root = new StackPanel { Spacing = 14 };
+
+            var headerRow = new Grid();
+            headerRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            headerRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             var header = new TextBlock
             {
                 Text = "Running VPOS Instances",
-                Foreground = (SolidColorBrush)Application.Current.Resources["PrimaryText"],
+                Foreground = primaryText,
                 FontSize = 16,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                Margin = new Thickness(0, 0, 0, 8)
+                VerticalAlignment = VerticalAlignment.Center,
             };
-            root.Children.Add(header);
+            Grid.SetColumn(header, 0);
+            headerRow.Children.Add(header);
 
-            _itemsHost = new StackPanel();
+            _countText = new TextBlock
+            {
+                Text = "0",
+                Foreground = accent,
+                FontSize = 12,
+                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                HorizontalAlignment = HorizontalAlignment.Center,
+            };
+            _countBadge = new Border
+            {
+                Background = new SolidColorBrush(Color.FromArgb(0x24, 0x00, 0xC8, 0x53)),
+                CornerRadius = new CornerRadius(999),
+                Padding = new Thickness(9, 2, 9, 2),
+                VerticalAlignment = VerticalAlignment.Center,
+                Child = _countText,
+            };
+            Grid.SetColumn(_countBadge, 1);
+            headerRow.Children.Add(_countBadge);
+
+            root.Children.Add(headerRow);
+
+            _itemsHost = new StackPanel { Spacing = 10 };
             root.Children.Add(_itemsHost);
 
             _emptyText = new TextBlock
             {
-                Text = "No VPOS instances currently running.",
-                Foreground = (SolidColorBrush)Application.Current.Resources["SecondaryText"],
+                Text = "More instances will appear here as they launch.",
+                Foreground = secondaryText,
+                FontSize = 12.5,
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(0, 24, 0, 0)
+                Margin = new Thickness(8, 24, 8, 24)
             };
             root.Children.Add(_emptyText);
 
             border.Child = root;
             this.Content = border;
+
+            UpdateCount();
 
             this.DataContextChanged += RunningProcessesPanel_DataContextChanged;
         }
@@ -107,47 +146,86 @@ namespace DumpLoader_2._0.Views
             }
 
             UpdateEmptyState();
+            UpdateCount();
         }
 
         private void AddCard(TrackedProcessViewModel t)
         {
+            var accent = (SolidColorBrush)Application.Current.Resources["PrimaryAccent"];
+            var primaryText = (SolidColorBrush)Application.Current.Resources["PrimaryText"];
+            var secondaryText = (SolidColorBrush)Application.Current.Resources["SecondaryText"];
+
             var border = new Border
             {
-                Background = new SolidColorBrush(Microsoft.UI.Colors.DarkGray) { Opacity = 0.17 },
+                Background = new SolidColorBrush(Color.FromArgb(0x09, 0xFF, 0xFF, 0xFF)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(0x0F, 0xFF, 0xFF, 0xFF)),
+                BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(10),
-                Margin = new Thickness(0, 0, 0, 8)
+                Padding = new Thickness(14),
             };
 
-            var sp = new StackPanel();
+            var sp = new StackPanel { Spacing = 8 };
 
-            var tbVersion = new TextBlock { Text = t.Version, Foreground = (Brush)Application.Current.Resources["PrimaryText"], FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
-            sp.Children.Add(tbVersion);
+            // Top row: version name (left) + status badge (right)
+            var topRow = new Grid();
+            topRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            topRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            var tbPid = new TextBlock { Text = $"PID: {t.ProcessId}", Foreground = (Brush)Application.Current.Resources["SecondaryText"] };
-            sp.Children.Add(tbPid);
+            var tbVersion = new TextBlock
+            {
+                Text = t.Version,
+                Foreground = primaryText,
+                FontSize = 14,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                VerticalAlignment = VerticalAlignment.Top,
+            };
+            Grid.SetColumn(tbVersion, 0);
+            topRow.Children.Add(tbVersion);
 
-            var tbStarted = new TextBlock { Text = $"Started: {t.StartTime:T}", Foreground = (Brush)Application.Current.Resources["SecondaryText"] };
-            sp.Children.Add(tbStarted);
+            var statusPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
 
-            var tbStatus = new TextBlock { Text = $"Status: {t.Status}", Foreground = (Brush)Application.Current.Resources["SecondaryText"] };
-            sp.Children.Add(tbStatus);
+            var haloGrid = new Grid { Width = 13, Height = 13, VerticalAlignment = VerticalAlignment.Center };
+            haloGrid.Children.Add(new Ellipse { Width = 13, Height = 13, Fill = new SolidColorBrush(Color.FromArgb(0x2E, 0x00, 0xC8, 0x53)) });
+            haloGrid.Children.Add(new Ellipse { Width = 7, Height = 7, Fill = accent, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center });
+            statusPanel.Children.Add(haloGrid);
 
-            var btnPanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 8, 0, 0) };
+            statusPanel.Children.Add(new TextBlock
+            {
+                Text = t.Status.ToUpperInvariant(),
+                Foreground = accent,
+                FontSize = 11,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                CharacterSpacing = 25,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
 
-            var btnFront = new Button { Content = "Bring To Front", Style = (Style)Application.Current.Resources["SecondaryButtonStyle"] };
+            Grid.SetColumn(statusPanel, 1);
+            topRow.Children.Add(statusPanel);
+
+            sp.Children.Add(topRow);
+
+            var metaPanel = new StackPanel { Spacing = 2 };
+            metaPanel.Children.Add(new TextBlock { Text = $"PID: {t.ProcessId}", Foreground = secondaryText, FontSize = 12 });
+            metaPanel.Children.Add(new TextBlock { Text = $"Started: {t.StartTime:T}", Foreground = secondaryText, FontSize = 12 });
+            sp.Children.Add(metaPanel);
+
+            var btnPanel = new Grid { Margin = new Thickness(0, 4, 0, 0), ColumnSpacing = 8 };
+            btnPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            btnPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var btnFront = new Button { Content = "Bring To Front", Style = (Style)Application.Current.Resources["SecondaryButtonStyle"], HorizontalAlignment = HorizontalAlignment.Stretch };
             btnFront.Click += (_, _) => { _ = t.BringToFrontCommand.ExecuteAsync(null); };
+            Grid.SetColumn(btnFront, 0);
             btnPanel.Children.Add(btnFront);
 
-            var btnStop = new Button { Content = "Stop", Style = (Style)Application.Current.Resources["DangerButtonStyle"] };
+            var btnStop = new Button { Content = "Stop", Style = (Style)Application.Current.Resources["DangerButtonStyle"], HorizontalAlignment = HorizontalAlignment.Stretch };
             btnStop.Click += async (_, _) => { await t.StopProcessCommand.ExecuteAsync(null); };
+            Grid.SetColumn(btnStop, 1);
             btnPanel.Children.Add(btnStop);
 
             sp.Children.Add(btnPanel);
 
             border.Child = sp;
-
-
 
             // store reference on the viewmodel (using Tag) to find later
             border.Tag = t;
@@ -159,6 +237,7 @@ namespace DumpLoader_2._0.Views
             // reacts to changes MainViewModel makes after dispatching to the UI thread.
 
             _itemsHost.Children.Add(border);
+            UpdateCount();
         }
 
         private void RemoveCard(TrackedProcessViewModel t)
@@ -168,11 +247,19 @@ namespace DumpLoader_2._0.Views
                 _itemsHost.Children.Remove(item);
 
             UpdateEmptyState();
+            UpdateCount();
         }
 
         private void UpdateEmptyState()
         {
             _emptyText.Visibility = _itemsHost.Children.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void UpdateCount()
+        {
+            var count = _itemsHost.Children.Count;
+            _countText.Text = count.ToString();
+            _countBadge.Visibility = count == 0 ? Visibility.Collapsed : Visibility.Visible;
         }
     }
 }

@@ -1,6 +1,9 @@
 using System;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.UI;
+using WinRT.Interop;
 using DumpLoader_2._0.ViewModels;
 
 namespace DumpLoader_2._0.Views
@@ -25,7 +28,38 @@ namespace DumpLoader_2._0.Views
                 root.DataContext = _viewModel;
             }
 
+            SetUpCustomTitleBar();
+
             this.Closed += MainWindow_Closed;
+        }
+
+        /// <summary>
+        /// Replaces the native white title bar/caption area with AppTitleBar (our own dark
+        /// menu-bar-styled Grid) while keeping the OS-drawn min/max/close buttons, recolored to
+        /// render directly on top of it instead of on their own separate light strip.
+        /// </summary>
+        private void SetUpCustomTitleBar()
+        {
+            this.ExtendsContentIntoTitleBar = true;
+            this.SetTitleBar(AppTitleBar);
+
+            var hwnd = WindowNative.GetWindowHandle(this);
+            var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
+            var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+            var titleBar = appWindow?.TitleBar;
+            if (titleBar == null)
+                return;
+
+            titleBar.BackgroundColor = Colors.Transparent;
+            titleBar.InactiveBackgroundColor = Colors.Transparent;
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+            titleBar.ButtonForegroundColor = Colors.White;
+            titleBar.ButtonInactiveForegroundColor = Color.FromArgb(255, 154, 154, 154);
+            titleBar.ButtonHoverBackgroundColor = Color.FromArgb(30, 255, 255, 255);
+            titleBar.ButtonHoverForegroundColor = Colors.White;
+            titleBar.ButtonPressedBackgroundColor = Color.FromArgb(50, 255, 255, 255);
+            titleBar.ButtonPressedForegroundColor = Colors.White;
         }
 
         private async void AddVersionButton_Click(object sender, RoutedEventArgs e)

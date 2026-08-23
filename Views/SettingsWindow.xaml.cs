@@ -4,6 +4,7 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Windows.Graphics;
+using Windows.UI;
 using WinRT.Interop;
 using DumpLoader_2._0.Services;
 using DumpLoader_2._0.ViewModels;
@@ -28,7 +29,30 @@ namespace DumpLoader_2._0.Views
             // the Browse/Close buttons unreachable outside the visible client area.
             appWindow?.Resize(new SizeInt32(560, 360));
 
+            SetUpCustomTitleBar(appWindow);
+
             DumpEditorPathTextBox.Text = _mainViewModel.DumpEditorExePath ?? string.Empty;
+        }
+
+        private void SetUpCustomTitleBar(AppWindow? appWindow)
+        {
+            this.ExtendsContentIntoTitleBar = true;
+            this.SetTitleBar(AppTitleBar);
+
+            var titleBar = appWindow?.TitleBar;
+            if (titleBar == null)
+                return;
+
+            titleBar.BackgroundColor = Colors.Transparent;
+            titleBar.InactiveBackgroundColor = Colors.Transparent;
+            titleBar.ButtonBackgroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
+            titleBar.ButtonForegroundColor = Colors.White;
+            titleBar.ButtonInactiveForegroundColor = Color.FromArgb(255, 154, 154, 154);
+            titleBar.ButtonHoverBackgroundColor = Color.FromArgb(30, 255, 255, 255);
+            titleBar.ButtonHoverForegroundColor = Colors.White;
+            titleBar.ButtonPressedBackgroundColor = Color.FromArgb(50, 255, 255, 255);
+            titleBar.ButtonPressedForegroundColor = Colors.White;
         }
 
         private async void BrowseButton_Click(object sender, RoutedEventArgs e)
