@@ -4,6 +4,7 @@ using System.IO;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using WinRT.Interop;
@@ -44,7 +45,20 @@ namespace DumpLoader_2._0.Views
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
             UpdateDumpEditorStatus();
 
+            _viewModel.TerminalLines.CollectionChanged += TerminalLines_CollectionChanged;
+
             this.Closed += MainWindow_Closed;
+        }
+
+        /// <summary>
+        /// Keeps the terminal panel pinned to the newest output line as DumpEditor.exe writes
+        /// more. UpdateLayout() first, so ScrollableHeight reflects the just-added line before we
+        /// scroll to it.
+        /// </summary>
+        private void TerminalLines_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            TerminalScrollViewer.UpdateLayout();
+            TerminalScrollViewer.ChangeView(null, TerminalScrollViewer.ScrollableHeight, null, true);
         }
 
         private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -98,6 +112,11 @@ namespace DumpLoader_2._0.Views
             titleBar.ButtonHoverForegroundColor = Colors.White;
             titleBar.ButtonPressedBackgroundColor = Color.FromArgb(50, 255, 255, 255);
             titleBar.ButtonPressedForegroundColor = Colors.White;
+        }
+
+        private void ScrollToBottomButton_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            LeftScrollViewer.ChangeView(null, LeftScrollViewer.ScrollableHeight, null);
         }
 
         private async void AddVersionButton_Click(object sender, RoutedEventArgs e)

@@ -14,6 +14,9 @@
             <SolidColorBrush x:Key="WindowBackground" Color="#FF17181A" />
             <SolidColorBrush x:Key="CardBackground" Color="#FF252526" />
             <SolidColorBrush x:Key="FieldBackground" Color="#FF1B1B1C" />
+            <!-- Darker than CardBackground/FieldBackground on purpose - the terminal panel sits
+                 nested inside a CardBackground card, and needs to read as a distinct "screen". -->
+            <SolidColorBrush x:Key="TerminalBackground" Color="#FF121214" />
             <SolidColorBrush x:Key="PrimaryAccent" Color="#FF00C853" />
             <SolidColorBrush x:Key="AccentInk" Color="#FF0C1F13" />
             <SolidColorBrush x:Key="PrimaryText" Color="White" />

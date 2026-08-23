@@ -29,9 +29,10 @@
             </MenuBar>
         </Grid>
 
-        <Grid Grid.Row="1" Padding="24" ColumnDefinitions="*,340" ColumnSpacing="24">
-            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <Grid RowDefinitions="Auto,24,Auto" ColumnDefinitions="*">
+        <Grid Grid.Row="1" Padding="24" ColumnDefinitions="60*,40*" ColumnSpacing="24">
+            <Grid Grid.Column="0">
+            <ScrollViewer x:Name="LeftScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid HorizontalAlignment="Stretch" RowDefinitions="Auto,24,Auto" ColumnDefinitions="*">
                 <!-- Section 1 Card -->
                 <Border Background="{StaticResource CardBackground}" CornerRadius="12" Padding="20">
                     <StackPanel Spacing="16">
@@ -70,8 +71,8 @@
                 <Border Grid.Row="2" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="20">
                     <StackPanel Spacing="16">
                         <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Automatic Dump Editing" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
-                            <ToggleSwitch Grid.Column="1" IsOn="{Binding Options.AutomaticDumpEditing, Mode=TwoWay}" OnContent="" OffContent="" />
+                            <TextBlock Grid.Column="0" Text="Automatic Dump Editing" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <ToggleSwitch Grid.Column="1" IsOn="{Binding Options.AutomaticDumpEditing, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="40" HorizontalAlignment="Right" />
                         </Grid>
 
                         <Rectangle Height="3" RadiusX="1.5" RadiusY="1.5" Fill="{StaticResource PrimaryAccent}" />
@@ -118,7 +119,44 @@
             </Grid>
             </ScrollViewer>
 
-            <views:RunningProcessesPanel Grid.Column="1" />
+            <!-- Plain clickable glyph, no button chrome (no background/border/hover fill) - just
+                 a floating green arrow. Background="Transparent" (not unset) is required so the
+                 whole Grid area around the glyph is still hit-testable. -->
+            <Grid x:Name="ScrollToBottomButton" Tapped="ScrollToBottomButton_Tapped"
+                  Background="Transparent" Width="32" Height="24"
+                  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,16,16">
+                <Path Data="M 4,4 L 16,16 L 28,4"
+                      Stroke="{StaticResource PrimaryAccent}" StrokeThickness="6"
+                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+            </Grid>
+            </Grid>
+
+            <Grid Grid.Column="1" RowDefinitions="65*,12,35*">
+                <views:RunningProcessesPanel Grid.Row="0" />
+
+                <!-- Terminal panel: outer CardBackground "lighter" container, with the actual
+                     terminal screen nested inside as a darker TerminalBackground surface, so the
+                     two read as visually distinct layers. -->
+                <Border Grid.Row="2" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16">
+                    <Grid RowDefinitions="Auto,12,*">
+                        <TextBlock Grid.Row="0" Text="DumpEditor Output" Foreground="{StaticResource PrimaryText}" FontSize="14" FontWeight="SemiBold" />
+
+                        <Border Grid.Row="2" Background="{StaticResource TerminalBackground}" CornerRadius="8" Padding="12">
+                            <ScrollViewer x:Name="TerminalScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding TerminalLines}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Foreground="{StaticResource PrimaryAccent}"
+                                                       FontFamily="Cascadia Mono, Consolas, monospace" FontSize="12"
+                                                       TextWrapping="NoWrap" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

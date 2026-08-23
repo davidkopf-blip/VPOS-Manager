@@ -57,6 +57,10 @@ namespace DumpLoader_2._0.ViewModels
         public IAsyncRelayCommand StartVposWithoutDumpCommand { get; }
         public ObservableCollection<TrackedProcessViewModel> TrackedProcesses { get; } = new();
 
+        /// <summary>Live stdout/stderr from the last DumpEditor.exe run, shown in the terminal panel.</summary>
+        public ObservableCollection<string> TerminalLines { get; } = new();
+        private const int MaxTerminalLines = 500;
+
         private readonly Window _window;
 
         public MainViewModel(Window window, string? initialDumpPath = null)
@@ -66,6 +70,16 @@ namespace DumpLoader_2._0.ViewModels
             SelectDumpCommand = new AsyncRelayCommand(ExecuteSelectDumpAsync);
             StartVposCommand = new AsyncRelayCommand(() => ExecuteStartVposAsync(loadDump: true));
             StartVposWithoutDumpCommand = new AsyncRelayCommand(() => ExecuteStartVposAsync(loadDump: false));
+
+            _dumpEditorService.OutputReceived += line =>
+            {
+                _window.DispatcherQueue.TryEnqueue(() =>
+                {
+                    TerminalLines.Add(line);
+                    while (TerminalLines.Count > MaxTerminalLines)
+                        TerminalLines.RemoveAt(0);
+                });
+            };
 
             // start monitor timer
             _monitorTimer = new Microsoft.UI.Xaml.DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };

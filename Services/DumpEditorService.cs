@@ -29,6 +29,9 @@ namespace DumpLoader_2._0.Services
     {
         private const string WorkFolderName = "VPOSManager";
 
+        /// <summary>Fires for each line DumpEditor.exe writes to stdout or stderr, in order.</summary>
+        public event Action<string>? OutputReceived;
+
         public async Task<string> CreateEditedDumpAsync(string dumpEditorExePath, string sourceDumpPath, DumpModificationOptions options)
         {
             if (string.IsNullOrEmpty(dumpEditorExePath))
@@ -64,13 +67,22 @@ namespace DumpLoader_2._0.Services
             var startInfo = new ProcessStartInfo(dumpEditorExePath)
             {
                 Arguments = $"\"{supportExmlPath}\" -nogui",
-                UseShellExecute = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
                 WorkingDirectory = dumpEditorRoot,
             };
 
-            using var process = Process.Start(startInfo);
-            if (process == null)
+            using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
+            process.OutputDataReceived += (_, e) => { if (e.Data != null) OutputReceived?.Invoke(e.Data); };
+            process.ErrorDataReceived += (_, e) => { if (e.Data != null) OutputReceived?.Invoke(e.Data); };
+
+            if (!process.Start())
                 throw new InvalidOperationException("DumpEditor.exe konnte nicht gestartet werden.");
+
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
 
             await process.WaitForExitAsync();
 

@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DruckenParameter.xml
+  ============================================================================
+  Referenz aller "Drucken"-Parameter aus dem VPOS Dump Editor (DIG), Tabelle 33.
+
+  Herkunft: aufgezeichnetes Durchklicken der Feldinformationen-Ansicht im Bereich
+  "Parameter Drucken" (C:\Users\david.kopf\Videos\VPOS\PARAMETER\DRUCKEN.mp4),
+  abgeglichen mit C:\Vectron\Dump-Editor\Examples\Parameter.cxml (Formular 153).
+
+  Adressierung: identisch zu WartungParameter.xml - jeder Parameter ist ein
+  einzelner Datensatz in Tabelle 33, Ebene 1, Feld 1:
+
+    <DirectAccess TableNo="33" PlaneNo="1">
+      <PutData RecPos="{RecPos}" FieldNo="1" Data="{Wert}" />
+    </DirectAccess>
+
+  RecPos entspricht der Nummer aus Parameter.cxml, sofern dort gelistet
+  (Quelle="cxml"). Quelle="video-neu" heisst: nicht in Parameter.cxml exportiert,
+  Name/Wertebereich stammen ausschliesslich aus dem Video.
+  ============================================================================
+-->
+<DruckenParameter Quelle="Parameter.cxml + DRUCKEN.mp4" TableNo="33" PlaneNo="1" FieldNo="1">
+  <!-- Bons -->
+  <Parameter RecPos="12" Name="Bons Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Bondruck (0 = kein Druck). -->
+  </Parameter>
+  <Parameter RecPos="14" Name="Bons Nachträgliche Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den nachträglichen Kopiedruck von Bons. -->
+  </Parameter>
+
+  <!-- Tischbons -->
+  <Parameter RecPos="15" Name="Tischbons Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Tischbondruck. -->
+  </Parameter>
+  <Parameter RecPos="16" Name="Tischbons Nachträgliche Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den nachträglichen Kopiedruck von Tischbons. -->
+  </Parameter>
+  <Parameter RecPos="33" Name="Tischbons Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Tischbons. -->
+  </Parameter>
+
+  <!-- Journal parallel -->
+  <Parameter RecPos="35" Name="Journal parallel Lokal" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für lokal parallel mitlaufenden Journaldruck. -->
+  </Parameter>
+
+  <!-- Rechnungen -->
+  <Parameter RecPos="36" Name="Rechnungen Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Rechnungsdruck. -->
+  </Parameter>
+
+  <!-- Programmdaten -->
+  <Parameter RecPos="37" Name="Programmdaten Drucker" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Ausdruck von Programmierdaten. -->
+  </Parameter>
+
+  <!-- Berichte/Journale -->
+  <Parameter RecPos="38" Name="Berichte/Journale Drucker" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Ausdruck von Berichten/Journalen. -->
+  </Parameter>
+  <Parameter RecPos="39" Name="Berichte/Journale Kopiedruck Journal" Minimum="0" Maximum="2" Quelle="cxml">
+    <!-- Steuert, ob beim Journaldruck zusätzlich eine Kopie mitgedruckt wird (0 = aus, 1-2 = Kopiermodus). -->
+  </Parameter>
+
+  <!-- Storno -->
+  <Parameter RecPos="40" Name="Storno Stornodrucker" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer des Stornodruckers. -->
+  </Parameter>
+
+  <!-- Programmdaten -->
+  <Parameter RecPos="41" Name="Programmdaten Trennlinie" Minimum="0" Maximum="6" Quelle="cxml">
+    <!-- Trennlinienstil zwischen Feldern beim Ausdruck von Programmierdaten (0 = keine, 1-6 = Linienvarianten). -->
+  </Parameter>
+
+  <!-- Infobon -->
+  <Parameter RecPos="45" Name="Infobon Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Infobondruck. -->
+  </Parameter>
+
+  <!-- Berichte/Journale -->
+  <Parameter RecPos="52" Name="Berichte/Journale Trennlinie" Minimum="0" Maximum="6" Quelle="cxml">
+    <!-- Trennlinienstil zwischen Feldern beim Ausdruck von Berichten/Journalen. -->
+  </Parameter>
+
+  <!-- Küchenmonitor -->
+  <Parameter RecPos="67" Name="Küchenmonitor Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Küchenmonitordruck. -->
+  </Parameter>
+
+  <!-- Programmdaten -->
+  <Parameter RecPos="73" Name="Programmdaten Titel" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Steuert, ob Programmierdaten-Ausdrucke einen Titel/Kopfzeile erhalten. -->
+  </Parameter>
+
+  <!-- Berichte/Journale -->
+  <Parameter RecPos="74" Name="Berichte/Journale Titel" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Steuert, ob Berichte/Journale-Ausdrucke einen Titel/Kopfzeile erhalten. -->
+  </Parameter>
+
+  <!-- Küchenmonitor -->
+  <Parameter RecPos="81" Name="Küchenmonitor Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck des Küchenmonitors. -->
+  </Parameter>
+
+  <!-- Vorgänge löschen -->
+  <Parameter RecPos="94" Name="Vorgänge löschen Bon an" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Löscht beim Löschen eines Vorgangs auch den zugehörigen Bon-Ausdruck. -->
+  </Parameter>
+
+  <!-- Rechnungen -->
+  <Parameter RecPos="99" Name="Rechnungen Rech.storno drucken" Minimum="0" Maximum="2" Quelle="cxml">
+    <!-- Steuert, ob beim Stornieren einer Rechnung ein Storno-Beleg gedruckt wird (0 = aus, 1-2 = Modus). -->
+  </Parameter>
+  <Parameter RecPos="101" Name="Rechnungen Formatwechsel halten" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Behält beim Wechsel des Ausdruckformats für Rechnungen das bisherige Format bei. -->
+  </Parameter>
+
+  <!-- Bons -->
+  <Parameter RecPos="102" Name="Bons Formatwechsel halten" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Behält beim Wechsel des Ausdruckformats für Bons das bisherige Format bei. -->
+  </Parameter>
+  <Parameter RecPos="113" Name="Bons Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Bons. -->
+  </Parameter>
+  <Parameter RecPos="121" Name="Bons Teilbonnr. drucken" Minimum="0" Maximum="3" Quelle="cxml">
+    <!-- Druckt die Teilbonnummer mit aus (0 = aus, 1-3 = Darstellungsvarianten). -->
+  </Parameter>
+
+  <!-- Infobon -->
+  <Parameter RecPos="123" Name="Infobon Kein-Verkauf-Druck" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Unterdrückt den Infobondruck bei einem Nicht-Verkauf. -->
+  </Parameter>
+
+  <!-- EFTs -->
+  <Parameter RecPos="147" Name="EFTs Aufladeterminal" Minimum="0" Maximum="10" Quelle="cxml" cxml_Menue="Zusatzgeräte" max_abweichend="true" max_video="8">
+    <!-- Druckerprofil-Nummer für den EFT-Aufladeterminal-Ausdruck (0-8 = Profilnummer). -->
+  </Parameter>
+
+  <!-- Haltegruppenbons -->
+  <Parameter RecPos="198" Name="Haltegruppenbons Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Haltegruppenbondruck. -->
+  </Parameter>
+
+  <!-- Infobon -->
+  <Parameter RecPos="204" Name="Infobon Separierbon drucken" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Druckt beim Separieren zusätzlich einen Infobon mit der Tischnummer. -->
+  </Parameter>
+
+  <!-- Haltegruppenbons -->
+  <Parameter RecPos="264" Name="Haltegruppenbons Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Haltegruppenbons. -->
+  </Parameter>
+
+  <!-- Rechnungen -->
+  <Parameter RecPos="265" Name="Rechnungen Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Rechnungen. -->
+  </Parameter>
+
+  <!-- Vorläufige Zahlung -->
+  <Parameter RecPos="266" Name="Vorläufige Zahlung Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standarddruck vorläufiger Zahlungen. -->
+  </Parameter>
+  <Parameter RecPos="267" Name="Vorläufige Zahlung Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck vorläufiger Zahlungen. -->
+  </Parameter>
+
+  <!-- Zahlungsabschluss -->
+  <Parameter RecPos="268" Name="Zahlungsabschluss Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standarddruck des Zahlungsabschlusses. -->
+  </Parameter>
+  <Parameter RecPos="269" Name="Zahlungsabschluss Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck des Zahlungsabschlusses. -->
+  </Parameter>
+
+  <!-- Infobon -->
+  <Parameter RecPos="270" Name="Infobon Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Infobons. -->
+  </Parameter>
+
+  <!-- Druckershift -->
+  <Parameter RecPos="313" Name="Druckershift Nach Profil" Minimum="0" Maximum="2" Quelle="cxml">
+    <!-- Verschiebt die Druckerzuordnung anhand des aktiven Hardwareprofils (0 = aus, 1-2 = Modus). -->
+  </Parameter>
+
+  <!-- Storno -->
+  <Parameter RecPos="320" Name="Storno Auch auf Std.drucker" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Druckt Stornos zusätzlich auf dem Standarddrucker mit. -->
+  </Parameter>
+
+  <!-- Bestellungen -->
+  <Parameter RecPos="330" Name="Bestellungen Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Bestellungsdruck. -->
+  </Parameter>
+  <Parameter RecPos="331" Name="Bestellungen Kopie" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Bestellungen. -->
+  </Parameter>
+  <Parameter RecPos="333" Name="Bestellungen Formatwechsel halten" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Behält beim Wechsel des Ausdruckformats für Bestellungen das bisherige Format bei. -->
+  </Parameter>
+
+  <!-- Print by round -->
+  <Parameter RecPos="341" Name="Print by round Drucker" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für „Print by round“ (rundenweiser Druck). -->
+  </Parameter>
+
+  <!-- Programmdaten -->
+  <Parameter RecPos="344" Name="Programmdaten Felder auswählen" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Erlaubt die Auswahl einzelner Felder beim Ausdruck von Programmierdaten. -->
+  </Parameter>
+
+  <!-- Print by round -->
+  <Parameter RecPos="358" Name="Print by round Rechnung" Minimum="0" Maximum="2" Quelle="cxml">
+    <!-- Steuert „Print by round“ für Rechnungen (0 = aus, 1-2 = Modus). -->
+  </Parameter>
+  <Parameter RecPos="359" Name="Print by round Minusp.n.Sep.zusamm." Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Fasst bei „Print by round“ negative Positionen nach dem Separieren zusammen. -->
+  </Parameter>
+
+  <!-- Legitimationsdruck -->
+  <Parameter RecPos="366" Name="Legitimationsdruck Standard" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Standard-Legitimationsdruck. -->
+  </Parameter>
+
+  <!-- Berichte/Journale -->
+  <Parameter RecPos="370" Name="Berichte/Journale Artikelber. Tr.linie" Minimum="0" Maximum="6" Quelle="cxml">
+    <!-- Trennlinienstil für den Artikelbericht innerhalb von Berichten/Journalen. -->
+  </Parameter>
+
+  <!-- Journal parallel -->
+  <Parameter RecPos="375" Name="Journal parallel Netz" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für parallel im Netz mitlaufenden Journaldruck. -->
+  </Parameter>
+
+  <!-- Druckerprofil -->
+  <Parameter RecPos="436" Name="Druckerprofil Zurücksetzen" Minimum="0" Maximum="3" Quelle="cxml">
+    <!-- Setzt das Druckerprofil auf den Ausgangszustand zurück (0-3 = Rücksetzmodus). -->
+  </Parameter>
+
+  <!-- Berichte/Journale -->
+  <Parameter RecPos="439" Name="Berichte/Journale Formatshift Journal" Minimum="0" Maximum="99" Quelle="cxml">
+    <!-- Verschiebt das Ausdruckformat von Berichten/Journalen (0-99 = Format-Shiftwert). -->
+  </Parameter>
+
+  <!-- Mailbox -->
+  <Parameter RecPos="456" Name="Mailbox Drucker" Minimum="0" Maximum="100" Quelle="cxml">
+    <!-- Druckerprofil-Nummer für den Mailbox-Ausdruck. -->
+  </Parameter>
+
+  <!-- Vorgänge löschen -->
+  <Parameter RecPos="494" Name="Vorgänge löschen Rechnung an" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Löscht beim Löschen eines Vorgangs auch den zugehörigen Rechnungsausdruck. -->
+  </Parameter>
+
+  <!-- Zusatztexte -->
+  <Parameter RecPos="499" Name="Zusatztexte Druck. aus Hauptart." Minimum="0" Maximum="3" Quelle="cxml">
+    <!-- Druckt Zusatztexte aus dem Hauptartikel mit (0 = aus, 1-3 = Modus). -->
+  </Parameter>
+
+  <!-- Sicherheit -->
+  <Parameter RecPos="516" Name="Sicherheit Schnittstelle 0 OK" Minimum="0" Maximum="1" Quelle="cxml">
+    <!-- Bestätigt Schnittstelle 0 als betriebsbereit, auch ohne angeschlossene Hardware (Sicherheits-/Testeinstellung). -->
+  </Parameter>
+
+  <!-- Lieferscheine -->
+  <Parameter RecPos="548" Name="Lieferscheine Drucker" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Ausdruck von Lieferscheinen. -->
+  </Parameter>
+  <Parameter RecPos="549" Name="Lieferscheine Drucker Kopie" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Lieferscheinen. -->
+  </Parameter>
+  <Parameter RecPos="550" Name="Lieferscheine Formatwechsel halten" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Behält beim Wechsel des Ausdruckformats für Lieferscheine das bisherige Format bei. -->
+  </Parameter>
+  <Parameter RecPos="554" Name="Lieferscheine Lief.storno drucken" Minimum="0" Maximum="2" Quelle="video-neu">
+    <!-- Druckt beim Stornieren eines Lieferscheins einen Storno-Beleg. -->
+  </Parameter>
+
+  <!-- Fiskalbelege -->
+  <Parameter RecPos="569" Name="Fiskalbelege Drucker" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Ausdruck von Fiskalbelegen. -->
+  </Parameter>
+  <Parameter RecPos="570" Name="Fiskalbelege Drucker Kopie" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Fiskalbelegen. -->
+  </Parameter>
+
+  <!-- Zahlungen -->
+  <Parameter RecPos="574" Name="Zahlungen Drucker" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Ausdruck von Zahlungen. -->
+  </Parameter>
+  <Parameter RecPos="575" Name="Zahlungen Drucker Kopie" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Zahlungen. -->
+  </Parameter>
+  <Parameter RecPos="576" Name="Zahlungen Formatwechsel halten" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Behält beim Wechsel des Ausdruckformats für Zahlungen das bisherige Format bei. -->
+  </Parameter>
+
+  <!-- Gutscheine -->
+  <Parameter RecPos="598" Name="Gutscheine Drucker" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Ausdruck von Gutscheinen. -->
+  </Parameter>
+  <Parameter RecPos="599" Name="Gutscheine Drucken mit" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Legt fest, womit Gutscheine bedruckt werden (Modus/Vorlage). -->
+  </Parameter>
+
+  <!-- Rechnungen -->
+  <Parameter RecPos="601" Name="Rechnungen Digitaler Bon" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Aktiviert den digitalen Bon für Rechnungen (Beleg wird digital statt/zusätzlich zu Papier bereitgestellt). -->
+  </Parameter>
+
+  <!-- Umbuchungen -->
+  <Parameter RecPos="637" Name="Umbuchungen Drucker" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Ausdruck von Umbuchungen. -->
+  </Parameter>
+  <Parameter RecPos="638" Name="Umbuchungen Drucker Kopie" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Druckerprofil-Nummer für den Kopiedruck von Umbuchungen. -->
+  </Parameter>
+  <Parameter RecPos="639" Name="Umbuchungen Formatwechsel halten" Minimum="0" Maximum="1" Quelle="video-neu">
+    <!-- Behält beim Wechsel des Ausdruckformats für Umbuchungen das bisherige Format bei. -->
+  </Parameter>
+
+  <!-- EFT -->
+  <Parameter RecPos="642" Name="EFT Händlerbeleg" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckt einen Händlerbeleg beim EFT-Zahlungsvorgang. -->
+  </Parameter>
+  <Parameter RecPos="643" Name="EFT Kundenbeleg" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckt einen Kundenbeleg beim EFT-Zahlungsvorgang. -->
+  </Parameter>
+  <Parameter RecPos="644" Name="EFT Formatvariante" Minimum="0" Maximum="8" Quelle="video-neu">
+    <!-- Format-/Layoutvariante für EFT-Belege. -->
+  </Parameter>
+  <Parameter RecPos="645" Name="EFT Verwaltungsbeleg" Minimum="0" Maximum="100" Quelle="video-neu">
+    <!-- Druckt einen Verwaltungsbeleg beim EFT-Zahlungsvorgang. -->
+  </Parameter>
+</DruckenParameter>
