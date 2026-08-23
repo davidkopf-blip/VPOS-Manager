@@ -75,6 +75,18 @@ namespace DumpLoader_2._0.Models
         }
 
         /// <summary>
+        /// When true, MyVectronUsername/MyVectronPassword are written to settings.json in
+        /// cleartext and restored on next launch. When false, they are only ever kept in memory
+        /// for the current session and never persisted.
+        /// </summary>
+        private bool _saveMyVectronCredentials;
+        public bool SaveMyVectronCredentials
+        {
+            get => _saveMyVectronCredentials;
+            set => SetProperty(ref _saveMyVectronCredentials, value);
+        }
+
+        /// <summary>
         /// Server environment for VectronConnect (33/1/524/1) and myVectron (33/1/589/1).
         /// false = Prod (both set to 0), true = Test (both set to 1). Always applied - not
         /// an opt-in checkbox like the others - whenever automatic dump editing runs.

@@ -42,6 +42,13 @@ namespace DumpLoader_2._0.ViewModels
             set => SetProperty(ref _isBusy, value);
         }
 
+        private string? _dumpEditorExePath;
+        public string? DumpEditorExePath
+        {
+            get => _dumpEditorExePath;
+            set => SetProperty(ref _dumpEditorExePath, value);
+        }
+
         public DumpModificationOptions Options { get; } = new DumpModificationOptions();
 
         public IAsyncRelayCommand AddVersionCommand { get; }
@@ -118,7 +125,10 @@ namespace DumpLoader_2._0.ViewModels
             Options.MyVectronUsername = settings.Options.MyVectronUsername;
             Options.MyVectronPasswordEnabled = settings.Options.MyVectronPasswordEnabled;
             Options.MyVectronPassword = settings.Options.MyVectronPassword;
+            Options.SaveMyVectronCredentials = settings.Options.SaveMyVectronCredentials;
             Options.IsTestServer = settings.Options.IsTestServer;
+
+            DumpEditorExePath = settings.DumpEditorExePath;
 
             // Do not overwrite a dump path that was selected by the user before initialization finished
             if (string.IsNullOrEmpty(SelectedDumpPath))
@@ -233,10 +243,16 @@ namespace DumpLoader_2._0.ViewModels
 
                 if (loadDump && Options.AutomaticDumpEditing)
                 {
+                    if (string.IsNullOrEmpty(DumpEditorExePath))
+                    {
+                        await ShowMessageAsync("Der Pfad zu DumpEditor.exe ist nicht konfiguriert. Bitte unter Settings festlegen.");
+                        return;
+                    }
+
                     LogAction("ExecuteStartVposAsync: running DumpEditor for automatic dump editing");
                     try
                     {
-                        dumpPathToLoad = await _dumpEditorService.CreateEditedDumpAsync(SelectedDumpPath!, Options);
+                        dumpPathToLoad = await _dumpEditorService.CreateEditedDumpAsync(DumpEditorExePath, SelectedDumpPath!, Options);
                         LogAction($"ExecuteStartVposAsync: DumpEditor produced {dumpPathToLoad}");
                     }
                     catch (Exception ex)
@@ -274,13 +290,56 @@ namespace DumpLoader_2._0.ViewModels
             }
         }
 
-        private async Task SaveSettingsAsync()
+        public async Task SaveSettingsAsync()
+        {
+            var settings = BuildSettingsForPersistence();
+            await _settingsService.SaveAsync(settings);
+        }
+
+        /// <summary>
+        /// Synchronous counterpart used on shutdown (Window.Closed) - see SettingsService.Save
+        /// for why this must not go through the async path there.
+        /// </summary>
+        public void SaveSettingsSync()
+        {
+            var settings = BuildSettingsForPersistence();
+            _settingsService.Save(settings);
+        }
+
+        private AppSettings BuildSettingsForPersistence()
         {
             var settings = new AppSettings();
             settings.Versions = Versions.ToList();
             settings.LastOpenedPath = SelectedDumpPath;
-            settings.Options = Options;
-            await _settingsService.SaveAsync(settings);
+            settings.Options = BuildOptionsForPersistence();
+            settings.DumpEditorExePath = DumpEditorExePath;
+            return settings;
+        }
+
+        /// <summary>
+        /// Builds the DumpModificationOptions instance that actually gets written to
+        /// settings.json. This is a snapshot copy, never the live Options object bound to the UI -
+        /// mutating that directly here would wipe out whatever the user is currently typing.
+        /// myVectron username/password are only included when SaveMyVectronCredentials is on;
+        /// otherwise they stay in-memory for this session only and are never persisted.
+        /// </summary>
+        private DumpModificationOptions BuildOptionsForPersistence()
+        {
+            return new DumpModificationOptions
+            {
+                AutomaticDumpEditing = Options.AutomaticDumpEditing,
+                DisablePrint = Options.DisablePrint,
+                DisableLicenseCheck = Options.DisableLicenseCheck,
+                DisableMyVectron = Options.DisableMyVectron,
+                DisableVectronConnect = Options.DisableVectronConnect,
+                DisableBonVito = Options.DisableBonVito,
+                MyVectronUsernameEnabled = Options.MyVectronUsernameEnabled,
+                MyVectronPasswordEnabled = Options.MyVectronPasswordEnabled,
+                SaveMyVectronCredentials = Options.SaveMyVectronCredentials,
+                MyVectronUsername = Options.SaveMyVectronCredentials ? Options.MyVectronUsername : null,
+                MyVectronPassword = Options.SaveMyVectronCredentials ? Options.MyVectronPassword : null,
+                IsTestServer = Options.IsTestServer,
+            };
         }
 
         private Task ShowMessageAsync(string text)

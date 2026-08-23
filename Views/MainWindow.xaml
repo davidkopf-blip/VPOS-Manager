@@ -12,7 +12,18 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid Padding="24" ColumnDefinitions="*,340" Background="{StaticResource WindowBackground}">
+    <Grid Background="{StaticResource WindowBackground}" RowDefinitions="Auto,*" RequestedTheme="Dark">
+
+        <MenuBar Grid.Row="0" Background="{StaticResource CardBackground}">
+            <MenuBarItem Title="Settings">
+                <MenuFlyoutItem Text="Open Settings..." Click="SettingsMenuItem_Click" />
+            </MenuBarItem>
+            <MenuBarItem Title="Help">
+                <MenuFlyoutItem Text="About VPOS Manager" Click="AboutMenuItem_Click" />
+            </MenuBarItem>
+        </MenuBar>
+
+    <Grid Grid.Row="1" Padding="24" ColumnDefinitions="*,340">
         <Grid Grid.Column="0" RowDefinitions="Auto,24,Auto" ColumnDefinitions="*">
             <!-- Section 1 Card -->
             <Border Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16">
@@ -67,21 +78,25 @@
                     <TextBlock Text="myVectron" Foreground="{StaticResource PrimaryText}" FontSize="16" FontWeight="SemiBold" />
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
                         <TextBlock Text="Prod" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
-                        <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" />
-                        <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                        <StackPanel Orientation="Horizontal" Spacing="0">
+                            <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" />
+                            <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="-8,0,0,0" />
+                        </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <CheckBox Content="mV Username" IsChecked="{Binding Options.MyVectronUsernameEnabled, Mode=TwoWay}" Width="180" />
-                        <TextBox Text="{Binding Options.MyVectronUsername, Mode=TwoWay}" Width="220" PlaceholderText="Username" IsEnabled="{Binding Options.MyVectronUsernameEnabled}" />
+                        <TextBox x:Name="MyVectronUsernameTextBox" Text="{Binding Options.MyVectronUsername, Mode=TwoWay}" Width="220" PlaceholderText="Username" IsEnabled="{Binding Options.MyVectronUsernameEnabled}" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <CheckBox Content="mV Password" IsChecked="{Binding Options.MyVectronPasswordEnabled, Mode=TwoWay}" Width="180" />
-                        <PasswordBox Password="{Binding Options.MyVectronPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.MyVectronPasswordEnabled}" />
+                        <PasswordBox x:Name="MyVectronPasswordBox" Password="{Binding Options.MyVectronPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.MyVectronPasswordEnabled}" />
                     </StackPanel>
+                    <CheckBox x:Name="SaveCredentialsCheckBox" Content="Save Username &amp; Password" IsChecked="{Binding Options.SaveMyVectronCredentials, Mode=TwoWay}" Click="SaveCredentialsCheckBox_Click" />
                 </StackPanel>
             </Border>
         </Grid>
 
         <views:RunningProcessesPanel Grid.Column="1" />
+    </Grid>
     </Grid>
 </Window>

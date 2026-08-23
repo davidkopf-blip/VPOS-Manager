@@ -8,5 +8,8 @@ namespace DumpLoader_2._0.Models
         public List<VersionEntry> Versions { get; set; } = new();
 
         public DumpModificationOptions Options { get; set; } = new DumpModificationOptions();
+
+        /// <summary>Path to DumpEditor.exe, configured via the Settings window.</summary>
+        public string? DumpEditorExePath { get; set; }
     }
 }

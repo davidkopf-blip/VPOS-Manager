@@ -91,6 +91,11 @@ namespace DumpLoader_2._0
                 LogStartupException(e.Exception, "Application.UnhandledException");
             }
             catch { }
+
+            // Without this, any unhandled exception on the UI thread (even from a single bad
+            // event handler) takes down the entire process. We log it above; mark it handled so
+            // a non-fatal UI bug doesn't kill the whole app.
+            e.Handled = true;
         }
 
         private void CurrentDomain_UnhandledException(object? sender, System.UnhandledExceptionEventArgs e)
