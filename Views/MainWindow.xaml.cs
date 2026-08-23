@@ -1,7 +1,10 @@
 using System;
+using System.ComponentModel;
+using System.IO;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using WinRT.Interop;
 using DumpLoader_2._0.ViewModels;
@@ -11,6 +14,11 @@ namespace DumpLoader_2._0.Views
     public sealed partial class MainWindow : Window
     {
         private readonly MainViewModel _viewModel;
+
+        private static readonly SolidColorBrush AccentBrush = new SolidColorBrush(Color.FromArgb(255, 0, 200, 83));
+        private static readonly SolidColorBrush AccentHaloBrush = new SolidColorBrush(Color.FromArgb(46, 0, 200, 83));
+        private static readonly SolidColorBrush DangerBrush = new SolidColorBrush(Color.FromArgb(255, 211, 47, 47));
+        private static readonly SolidColorBrush DangerHaloBrush = new SolidColorBrush(Color.FromArgb(46, 211, 47, 47));
 
         public MainWindow()
             : this(null)
@@ -30,7 +38,37 @@ namespace DumpLoader_2._0.Views
 
             SetUpCustomTitleBar();
 
+            // Covers the initial load (settings load asynchronously after the constructor
+            // returns) and any change made from the Settings window, since it mutates this same
+            // MainViewModel instance.
+            _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+            UpdateDumpEditorStatus();
+
             this.Closed += MainWindow_Closed;
+        }
+
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(MainViewModel.DumpEditorExePath))
+                UpdateDumpEditorStatus();
+        }
+
+        /// <summary>
+        /// Same red/green halo-dot status shown in Settings, mirrored here (top-right of the
+        /// Versions row) so it's visible without opening Settings.
+        /// </summary>
+        private void UpdateDumpEditorStatus()
+        {
+            var path = _viewModel.DumpEditorExePath;
+            var isValid = !string.IsNullOrEmpty(path) && File.Exists(path);
+
+            var dotBrush = isValid ? AccentBrush : DangerBrush;
+            var haloBrush = isValid ? AccentHaloBrush : DangerHaloBrush;
+
+            MainStatusDotEllipse.Fill = dotBrush;
+            MainStatusHaloEllipse.Fill = haloBrush;
+            MainStatusText.Foreground = dotBrush;
+            MainStatusText.Text = isValid ? "DumpEditor.exe found" : "No DumpEditor.exe selected";
         }
 
         /// <summary>
@@ -85,6 +123,7 @@ namespace DumpLoader_2._0.Views
         private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var settingsWindow = new SettingsWindow(_viewModel);
+            settingsWindow.Closed += (_, _) => UpdateDumpEditorStatus();
             settingsWindow.Activate();
         }
 

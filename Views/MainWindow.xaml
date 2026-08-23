@@ -30,17 +30,27 @@
         </Grid>
 
         <Grid Grid.Row="1" Padding="24" ColumnDefinitions="*,340" ColumnSpacing="24">
-            <Grid Grid.Column="0" RowDefinitions="Auto,24,Auto" ColumnDefinitions="*">
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid RowDefinitions="Auto,24,Auto" ColumnDefinitions="*">
                 <!-- Section 1 Card -->
                 <Border Background="{StaticResource CardBackground}" CornerRadius="12" Padding="20">
                     <StackPanel Spacing="16">
                         <TextBlock Text="Versions" Foreground="{StaticResource PrimaryText}" FontSize="18" FontWeight="SemiBold" />
 
                         <!-- Row 1 -->
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <ComboBox x:Name="VersionsComboBox" Width="220" ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}" DisplayMemberPath="Version" />
-                            <Button x:Name="AddVersionButton" Content="Add Version" Click="AddVersionButton_Click" />
-                        </StackPanel>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                                <ComboBox x:Name="VersionsComboBox" Width="220" ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}" DisplayMemberPath="Version" />
+                                <Button x:Name="AddVersionButton" Content="Add Version" Click="AddVersionButton_Click" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Grid Width="13" Height="13" VerticalAlignment="Center">
+                                    <Ellipse x:Name="MainStatusHaloEllipse" Width="13" Height="13" />
+                                    <Ellipse x:Name="MainStatusDotEllipse" Width="7" Height="7" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock x:Name="MainStatusText" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
 
                         <!-- Row 2 -->
                         <StackPanel Orientation="Horizontal" Spacing="8">
@@ -64,7 +74,7 @@
                             <ToggleSwitch Grid.Column="1" IsOn="{Binding Options.AutomaticDumpEditing, Mode=TwoWay}" OnContent="" OffContent="" />
                         </Grid>
 
-                        <Rectangle Height="1" Fill="{StaticResource HairlineBrush}" />
+                        <Rectangle Height="3" RadiusX="1.5" RadiusY="1.5" Fill="{StaticResource PrimaryAccent}" />
 
                         <StackPanel Spacing="12">
                             <TextBlock Text="GENERAL SETTINGS" Style="{StaticResource SectionLabelStyle}" />
@@ -88,8 +98,8 @@
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
                                 <TextBlock Text="Prod" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
                                 <StackPanel Orientation="Horizontal" Spacing="0">
-                                    <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" />
-                                    <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="-8,0,0,0" />
+                                    <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="40" />
+                                    <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="-6,0,0,0" />
                                 </StackPanel>
                             </StackPanel>
 
@@ -106,6 +116,7 @@
                     </StackPanel>
                 </Border>
             </Grid>
+            </ScrollViewer>
 
             <views:RunningProcessesPanel Grid.Column="1" />
         </Grid>

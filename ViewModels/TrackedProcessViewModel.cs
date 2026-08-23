@@ -23,7 +23,22 @@ namespace DumpLoader_2._0.ViewModels
         public IAsyncRelayCommand BringToFrontCommand { get; }
         public IAsyncRelayCommand StopProcessCommand { get; }
 
+        /// <summary>
+        /// VPOS starts in two stages: this tracked process is alive from the moment it's
+        /// launched, but its actual main window (and thus a valid MainWindowHandle) only
+        /// appears once the dump has finished loading. False until then - the UI hides
+        /// "Bring To Front" while this is false, since calling it too early was crashing.
+        /// </summary>
+        private bool _isWindowReady;
+        public bool IsWindowReady
+        {
+            get => _isWindowReady;
+            private set => SetProperty(ref _isWindowReady, value);
+        }
+
         public event Action<TrackedProcessViewModel>? RequestRemove;
+
+        private readonly Microsoft.UI.Xaml.DispatcherTimer _windowCheckTimer;
 
         public TrackedProcessViewModel(Process process, string version, Func<string, Task> showMessageAsync)
         {
@@ -43,6 +58,34 @@ namespace DumpLoader_2._0.ViewModels
             catch
             {
                 // ignore
+            }
+
+            _windowCheckTimer = new Microsoft.UI.Xaml.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+            _windowCheckTimer.Tick += (_, _) => CheckWindowReady();
+            _windowCheckTimer.Start();
+            CheckWindowReady();
+        }
+
+        private void CheckWindowReady()
+        {
+            try
+            {
+                if (_process.HasExited)
+                {
+                    _windowCheckTimer.Stop();
+                    return;
+                }
+
+                if (_process.MainWindowHandle != IntPtr.Zero)
+                {
+                    IsWindowReady = true;
+                    _windowCheckTimer.Stop();
+                }
+            }
+            catch
+            {
+                // process may have transitioned (e.g. exited) between the HasExited check above
+                // and here - the Exited handler will clean this card up separately.
             }
         }
 
@@ -106,6 +149,12 @@ namespace DumpLoader_2._0.ViewModels
 
         public void Dispose()
         {
+            try
+            {
+                _windowCheckTimer.Stop();
+            }
+            catch { }
+
             try
             {
                 _process.Exited -= (_, _) => RequestRemove?.Invoke(this);

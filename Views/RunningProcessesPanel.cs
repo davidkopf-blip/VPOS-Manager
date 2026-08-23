@@ -213,6 +213,10 @@ namespace DumpLoader_2._0.Views
             btnPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             btnPanel.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
+            // VPOS starts in two stages: the process is alive well before it has a real main
+            // window. Calling "Bring To Front" before then crashed, so the button stays hidden
+            // (and Stop takes the full row) until TrackedProcessViewModel confirms a window
+            // exists.
             var btnFront = new Button { Content = "Bring To Front", Style = (Style)Application.Current.Resources["SecondaryButtonStyle"], HorizontalAlignment = HorizontalAlignment.Stretch };
             btnFront.Click += (_, _) => { _ = t.BringToFrontCommand.ExecuteAsync(null); };
             Grid.SetColumn(btnFront, 0);
@@ -220,8 +224,30 @@ namespace DumpLoader_2._0.Views
 
             var btnStop = new Button { Content = "Stop", Style = (Style)Application.Current.Resources["DangerButtonStyle"], HorizontalAlignment = HorizontalAlignment.Stretch };
             btnStop.Click += async (_, _) => { await t.StopProcessCommand.ExecuteAsync(null); };
-            Grid.SetColumn(btnStop, 1);
             btnPanel.Children.Add(btnStop);
+
+            void ApplyWindowReadyState()
+            {
+                if (t.IsWindowReady)
+                {
+                    btnFront.Visibility = Visibility.Visible;
+                    Grid.SetColumn(btnStop, 1);
+                    Grid.SetColumnSpan(btnStop, 1);
+                }
+                else
+                {
+                    btnFront.Visibility = Visibility.Collapsed;
+                    Grid.SetColumn(btnStop, 0);
+                    Grid.SetColumnSpan(btnStop, 2);
+                }
+            }
+
+            ApplyWindowReadyState();
+            t.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(TrackedProcessViewModel.IsWindowReady))
+                    ApplyWindowReadyState();
+            };
 
             sp.Children.Add(btnPanel);
 

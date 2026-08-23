@@ -1,8 +1,10 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
 using Windows.UI;
 using WinRT.Interop;
@@ -16,6 +18,11 @@ namespace DumpLoader_2._0.Views
         private readonly MainViewModel _mainViewModel;
         private readonly FilePickerService _filePicker = new FilePickerService();
 
+        private static readonly SolidColorBrush AccentBrush = new SolidColorBrush(Color.FromArgb(255, 0, 200, 83));
+        private static readonly SolidColorBrush AccentHaloBrush = new SolidColorBrush(Color.FromArgb(46, 0, 200, 83));
+        private static readonly SolidColorBrush DangerBrush = new SolidColorBrush(Color.FromArgb(255, 211, 47, 47));
+        private static readonly SolidColorBrush DangerHaloBrush = new SolidColorBrush(Color.FromArgb(46, 211, 47, 47));
+
         public SettingsWindow(MainViewModel mainViewModel)
         {
             _mainViewModel = mainViewModel;
@@ -24,14 +31,12 @@ namespace DumpLoader_2._0.Views
             var hwnd = WindowNative.GetWindowHandle(this);
             var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = AppWindow.GetFromWindowId(windowId);
-            // Generous margin over the content's actual size (title bar + border padding +
-            // stacked rows) so nothing gets clipped - a too-small window here previously left
-            // the Browse/Close buttons unreachable outside the visible client area.
-            appWindow?.Resize(new SizeInt32(560, 360));
+            appWindow?.Resize(new SizeInt32(670, 325));
 
             SetUpCustomTitleBar(appWindow);
 
             DumpEditorPathTextBox.Text = _mainViewModel.DumpEditorExePath ?? string.Empty;
+            UpdateDumpEditorStatus();
         }
 
         private void SetUpCustomTitleBar(AppWindow? appWindow)
@@ -70,6 +75,7 @@ namespace DumpLoader_2._0.Views
 
                 _mainViewModel.DumpEditorExePath = path;
                 DumpEditorPathTextBox.Text = path;
+                UpdateDumpEditorStatus();
                 await _mainViewModel.SaveSettingsAsync();
             }
             catch (Exception ex)
@@ -85,8 +91,29 @@ namespace DumpLoader_2._0.Views
             }
         }
 
+        /// <summary>
+        /// Colors/labels the status dot+text red ("no valid DumpEditor.exe") or green ("found"),
+        /// matching the same halo-dot look used for process status in RunningProcessesPanel.
+        /// </summary>
+        private void UpdateDumpEditorStatus()
+        {
+            var path = _mainViewModel.DumpEditorExePath;
+            var isValid = !string.IsNullOrEmpty(path) && File.Exists(path);
+
+            var dotBrush = isValid ? AccentBrush : DangerBrush;
+            var haloBrush = isValid ? AccentHaloBrush : DangerHaloBrush;
+
+            StatusDotEllipse.Fill = dotBrush;
+            StatusHaloEllipse.Fill = haloBrush;
+            StatusText.Foreground = dotBrush;
+            StatusText.Text = isValid ? "DumpEditor.exe found" : "No DumpEditor.exe selected";
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            // Re-check in case the configured path became invalid/valid since the window opened
+            // (e.g. the file was moved) so the main window's next dump-editing run reflects it.
+            UpdateDumpEditorStatus();
             this.Close();
         }
     }
