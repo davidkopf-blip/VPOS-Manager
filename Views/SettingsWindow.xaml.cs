@@ -31,11 +31,12 @@ namespace DumpLoader_2._0.Views
             var hwnd = WindowNative.GetWindowHandle(this);
             var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
             var appWindow = AppWindow.GetFromWindowId(windowId);
-            appWindow?.Resize(new SizeInt32(670, 325));
+            appWindow?.Resize(new SizeInt32(660, 430));
 
             SetUpCustomTitleBar(appWindow);
 
             DumpEditorPathTextBox.Text = _mainViewModel.DumpEditorExePath ?? string.Empty;
+            VppPathTextBox.Text = _mainViewModel.VppFolderPath ?? string.Empty;
             UpdateDumpEditorStatus();
         }
 
@@ -80,14 +81,25 @@ namespace DumpLoader_2._0.Views
             }
             catch (Exception ex)
             {
-                var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
-                {
-                    XamlRoot = ((FrameworkElement)this.Content).XamlRoot,
-                    Title = "Fehler",
-                    Content = $"Datei konnte nicht ausgewählt werden: {ex.Message}",
-                    CloseButtonText = "OK"
-                };
-                await dialog.ShowAsync().AsTask();
+                ErrorReportingService.ShowError($"Datei konnte nicht ausgewählt werden: {ex.Message}", ex, "Fehler bei der Dateiauswahl");
+            }
+        }
+
+        private async void VppBrowseButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var path = await _filePicker.PickFolderAsync(this);
+                if (string.IsNullOrEmpty(path))
+                    return;
+
+                _mainViewModel.VppFolderPath = path;
+                VppPathTextBox.Text = path;
+                await _mainViewModel.SaveSettingsAsync();
+            }
+            catch (Exception ex)
+            {
+                ErrorReportingService.ShowError($"Ordner konnte nicht ausgewählt werden: {ex.Message}", ex, "Fehler bei der Ordnerauswahl");
             }
         }
 

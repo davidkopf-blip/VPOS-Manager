@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -49,17 +50,42 @@ namespace DumpLoader_2._0.ViewModels
             set => SetProperty(ref _dumpEditorExePath, value);
         }
 
+        private string? _vppFolderPath;
+        /// <summary>Folder containing the per-version "VPP-{Version}.VPP" files.</summary>
+        public string? VppFolderPath
+        {
+            get => _vppFolderPath;
+            set => SetProperty(ref _vppFolderPath, value);
+        }
+
         public DumpModificationOptions Options { get; } = new DumpModificationOptions();
 
         public IAsyncRelayCommand AddVersionCommand { get; }
         public IAsyncRelayCommand SelectDumpCommand { get; }
         public IAsyncRelayCommand StartVposCommand { get; }
         public IAsyncRelayCommand StartVposWithoutDumpCommand { get; }
+        public IAsyncRelayCommand DeleteDataLoadDumpAndStartVposCommand { get; }
+        public IAsyncRelayCommand LaunchIntoStartMenuCommand { get; }
         public ObservableCollection<TrackedProcessViewModel> TrackedProcesses { get; } = new();
 
         /// <summary>Live stdout/stderr from the last DumpEditor.exe run, shown in the terminal panel.</summary>
         public ObservableCollection<string> TerminalLines { get; } = new();
         private const int MaxTerminalLines = 500;
+
+        /// <summary>
+        /// Appends one line to the status panel - both DumpEditor.exe's raw stdout/stderr and our
+        /// own status notifications ("VPOS started", "Loading dump...") go through here, so the
+        /// panel reads as a single status log rather than just a process console.
+        /// </summary>
+        private void AppendStatus(string line)
+        {
+            _window.DispatcherQueue.TryEnqueue(() =>
+            {
+                TerminalLines.Add(line);
+                while (TerminalLines.Count > MaxTerminalLines)
+                    TerminalLines.RemoveAt(0);
+            });
+        }
 
         private readonly Window _window;
 
@@ -70,16 +96,10 @@ namespace DumpLoader_2._0.ViewModels
             SelectDumpCommand = new AsyncRelayCommand(ExecuteSelectDumpAsync);
             StartVposCommand = new AsyncRelayCommand(() => ExecuteStartVposAsync(loadDump: true));
             StartVposWithoutDumpCommand = new AsyncRelayCommand(() => ExecuteStartVposAsync(loadDump: false));
+            DeleteDataLoadDumpAndStartVposCommand = new AsyncRelayCommand(() => ExecuteStartVposAsync(loadDump: true, deleteData: true));
+            LaunchIntoStartMenuCommand = new AsyncRelayCommand(() => ExecuteStartVposAsync(loadDump: false, startMenu: true));
 
-            _dumpEditorService.OutputReceived += line =>
-            {
-                _window.DispatcherQueue.TryEnqueue(() =>
-                {
-                    TerminalLines.Add(line);
-                    while (TerminalLines.Count > MaxTerminalLines)
-                        TerminalLines.RemoveAt(0);
-                });
-            };
+            _dumpEditorService.OutputReceived += line => AppendStatus(line);
 
             // start monitor timer
             _monitorTimer = new Microsoft.UI.Xaml.DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
@@ -143,6 +163,7 @@ namespace DumpLoader_2._0.ViewModels
             Options.IsTestServer = settings.Options.IsTestServer;
 
             DumpEditorExePath = settings.DumpEditorExePath;
+            VppFolderPath = settings.VppFolderPath;
 
             // Do not overwrite a dump path that was selected by the user before initialization finished
             if (string.IsNullOrEmpty(SelectedDumpPath))
@@ -209,8 +230,7 @@ namespace DumpLoader_2._0.ViewModels
             catch (Exception ex)
             {
                 LogAction($"ExecuteAddVersionAsync:error: {ex}");
-                // show dialog
-                await ShowMessageAsync($"Fehler beim Lesen der Datei: {ex.Message}");
+                ErrorReportingService.ShowError($"Fehler beim Lesen der Datei: {ex.Message}", ex, "Version konnte nicht hinzugefügt werden");
             }
             finally
             {
@@ -228,9 +248,9 @@ namespace DumpLoader_2._0.ViewModels
             await SaveSettingsAsync();
         }
 
-        private async Task ExecuteStartVposAsync(bool loadDump)
+        private async Task ExecuteStartVposAsync(bool loadDump, bool deleteData = false, bool startMenu = false)
         {
-            LogAction($"ExecuteStartVposAsync:start loadDump={loadDump}");
+            LogAction($"ExecuteStartVposAsync:start loadDump={loadDump} deleteData={deleteData} startMenu={startMenu}");
             if (SelectedVersion == null)
             {
                 await ShowMessageAsync("Bitte wählen Sie zuerst eine Version aus.");
@@ -255,35 +275,84 @@ namespace DumpLoader_2._0.ViewModels
             {
                 var dumpPathToLoad = SelectedDumpPath;
 
+                if (deleteData)
+                {
+                    AppendStatus(Options.AutomaticDumpEditing
+                        ? "Deleting DATA folder, loading dump, and starting VPOS..."
+                        : "Deleting DATA folder, loading dump (automatic dump editing is off), and starting VPOS...");
+
+                    try
+                    {
+                        var exeDirectory = Path.GetDirectoryName(exePath);
+                        var dataFolder = !string.IsNullOrEmpty(exeDirectory) ? Path.Combine(exeDirectory, "DATA") : null;
+                        if (!string.IsNullOrEmpty(dataFolder) && Directory.Exists(dataFolder))
+                        {
+                            LogAction($"ExecuteStartVposAsync: deleting DATA folder {dataFolder}");
+                            Directory.Delete(dataFolder, recursive: true);
+                            AppendStatus("DATA folder deleted.");
+                        }
+                        else
+                        {
+                            AppendStatus("No DATA folder found - nothing to delete.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogAction($"ExecuteStartVposAsync: deleting DATA folder failed: {ex}");
+                        AppendStatus($"Deleting DATA folder failed: {ex.Message}");
+                        ErrorReportingService.ShowError($"Löschen des DATA-Ordners fehlgeschlagen: {ex.Message}", ex, "DATA-Ordner konnte nicht gelöscht werden");
+                        return;
+                    }
+                }
+                else if (loadDump)
+                {
+                    AppendStatus(Options.AutomaticDumpEditing
+                        ? "Loading dump and starting VPOS..."
+                        : "Loading dump (automatic dump editing is off) and starting VPOS...");
+                }
+                else if (startMenu)
+                {
+                    AppendStatus("Starting VPOS into Start Menu...");
+                }
+                else
+                {
+                    AppendStatus("Starting VPOS...");
+                }
+
                 if (loadDump && Options.AutomaticDumpEditing)
                 {
                     if (string.IsNullOrEmpty(DumpEditorExePath))
                     {
-                        await ShowMessageAsync("Der Pfad zu DumpEditor.exe ist nicht konfiguriert. Bitte unter Settings festlegen.");
+                        AppendStatus("DumpEditor.exe path not configured - aborted.");
+                        ErrorReportingService.ShowError("Der Pfad zu DumpEditor.exe ist nicht konfiguriert. Bitte unter Settings festlegen.", title: "DumpEditor.exe nicht konfiguriert");
                         return;
                     }
 
                     LogAction("ExecuteStartVposAsync: running DumpEditor for automatic dump editing");
+                    AppendStatus("Running DumpEditor to apply dump modifications...");
                     try
                     {
-                        dumpPathToLoad = await _dumpEditorService.CreateEditedDumpAsync(DumpEditorExePath, SelectedDumpPath!, Options);
+                        dumpPathToLoad = await _dumpEditorService.CreateEditedDumpAsync(DumpEditorExePath, SelectedDumpPath!, Options, selectedEntry?.Version, VppFolderPath);
                         LogAction($"ExecuteStartVposAsync: DumpEditor produced {dumpPathToLoad}");
+                        AppendStatus("DumpEditor finished successfully.");
                     }
                     catch (Exception ex)
                     {
                         LogAction($"ExecuteStartVposAsync: DumpEditor failed: {ex}");
-                        await ShowMessageAsync($"Automatische Dump-Bearbeitung fehlgeschlagen: {ex.Message}");
+                        AppendStatus($"DumpEditor failed: {ex.Message}");
+                        ErrorReportingService.ShowError($"Automatische Dump-Bearbeitung fehlgeschlagen: {ex.Message}", ex, "Dump-Bearbeitung fehlgeschlagen");
                         return;
                     }
                 }
 
-                var args = loadDump ? $"/LoadDump:\"{dumpPathToLoad}\"" : null;
+                var args = loadDump ? $"/LoadDump:\"{dumpPathToLoad}\"" : (startMenu ? "/StartMenu" : null);
                 LogAction($"Starting process: {exePath} {args}");
                 var proc = _processService.StartProcess(exePath, args);
                 if (proc == null)
                 {
                     LogAction("StartVpos: process start returned null");
-                    await ShowMessageAsync("VPOS konnte nicht gestartet werden.");
+                    AppendStatus("VPOS failed to start.");
+                    ErrorReportingService.ShowError("VPOS konnte nicht gestartet werden.", title: "VPOS konnte nicht gestartet werden");
                     return;
                 }
 
@@ -292,11 +361,13 @@ namespace DumpLoader_2._0.ViewModels
                 tracked.RequestRemove += (vm) => RemoveTrackedProcess(vm);
                 TrackedProcesses.Add(tracked);
                 LogAction($"StartVpos: started PID={proc.Id}");
+                AppendStatus($"VPOS started (PID {proc.Id}).");
             }
             catch (Exception ex)
             {
                 LogAction($"ExecuteStartVposAsync:error: {ex}");
-                await ShowMessageAsync($"Fehler beim Starten: {ex.Message}");
+                AppendStatus($"Error starting VPOS: {ex.Message}");
+                ErrorReportingService.ShowError($"Fehler beim Starten: {ex.Message}", ex, "Fehler beim Starten von VPOS");
             }
             finally
             {
@@ -327,6 +398,7 @@ namespace DumpLoader_2._0.ViewModels
             settings.LastOpenedPath = SelectedDumpPath;
             settings.Options = BuildOptionsForPersistence();
             settings.DumpEditorExePath = DumpEditorExePath;
+            settings.VppFolderPath = VppFolderPath;
             return settings;
         }
 
@@ -356,17 +428,34 @@ namespace DumpLoader_2._0.ViewModels
             };
         }
 
+        /// <summary>
+        /// Lightweight, non-error guidance only ("please select a version first") - actual
+        /// failures go through ErrorReportingService.ShowError instead, which uses a real Window
+        /// rather than a ContentDialog and so isn't affected by the XamlRoot issue below.
+        /// </summary>
         private Task ShowMessageAsync(string text)
         {
-            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+            _window.DispatcherQueue.TryEnqueue(() =>
             {
-                Title = "Information",
-                Content = text,
-                CloseButtonText = "OK"
-            };
-
-            // Fire-and-forget show on UI thread
-            _window.DispatcherQueue.TryEnqueue(() => { _ = dialog.ShowAsync().AsTask(); });
+                try
+                {
+                    var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+                    {
+                        // Required in WinUI 3 Desktop - without it, ShowAsync() throws instead of
+                        // displaying anything, which previously failed silently here because the
+                        // call was fire-and-forget.
+                        XamlRoot = ((Microsoft.UI.Xaml.FrameworkElement)_window.Content).XamlRoot,
+                        Title = "Information",
+                        Content = text,
+                        CloseButtonText = "OK"
+                    };
+                    _ = dialog.ShowAsync().AsTask();
+                }
+                catch (Exception ex)
+                {
+                    LogAction($"ShowMessageAsync failed: {ex}");
+                }
+            });
             return Task.CompletedTask;
         }
 

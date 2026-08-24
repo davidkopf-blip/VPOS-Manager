@@ -13,7 +13,10 @@ number is read straight from the file's own metadata and remembered between sess
 
 **Dump loading**
 Pick a `.vpd`/`.VPosDump` file and launch it against any registered version via `/LoadDump`, or
-start a version standalone without a dump.
+start a version standalone without a dump. "Delete DATA, load Dump & Start VPOS" additionally
+wipes the selected version's `DATA` folder before loading the dump (evaluating automatic dump
+editing the same way as the plain load button), and "Launch into Startmenu" starts the selected
+version straight into VPOS's start menu via `/StartMenu`.
 
 **VPOS task manager**
 Every VPOS instance launched through the tool is tracked in a live side panel — bring any of them
@@ -29,15 +32,107 @@ toggles:
 - Disable VectronConnect
 - Disable bonVito
 
+Before DumpEditor.exe runs, the app also swaps in the VPP program file matching the selected VPOS
+version (`VPP-{Version}.VPP` from the configured VPP Path, copied in as `VPOSPROG.DLL`), so the
+dump is always edited with the correct version's program logic.
+
 **myVectron overrides**
 Bake a specific myVectron username/password into the dump before launch, and flip a single switch
 to point VectronConnect and myVectron at the Test or Prod server environment.
+
+**Status log**
+A live status panel shows what's happening as a dump loads and VPOS starts — from "Loading dump
+and starting VPOS..." through the VPP/DumpEditor steps to "VPOS started" — alongside DumpEditor's
+raw output, all in one place.
+
+**Error handling**
+Genuine failures (a locked VPOSPROG.DLL, an unreachable VPP network path, a dump that can't be
+loaded, a process that won't start, and so on) surface in an app-styled error window with a
+collapsible details section, instead of a plain dialog or a silent failure. An app-wide handler
+catches anything else that would otherwise crash the app, logs it, and shows the same error
+window instead.
 
 **Persistence & diagnostics**
 Registered versions, the last-used dump path, and every toggle above are saved between runs.
 Startup errors and key actions are logged to timestamped files for troubleshooting.
 
 ## Changelog
+
+### 0.9.0 — App-wide error handling & crash safety
+- Added a new app-styled error window (`ErrorWindow`), replacing the default unstyled
+  ContentDialogs for real failures. It shows a friendly message plus a collapsible "Show
+  details" section with the full exception (and a "Copy details" button), all in the same dark
+  card design as the rest of the app.
+- Added `ErrorReportingService`, a single app-wide entry point that logs every error to
+  `errors.log` and shows the error window, callable from anywhere (including background threads
+  and global exception handlers) since it opens a real Window rather than depending on a
+  XamlRoot.
+- Every operation that can genuinely fail and block a core function — adding a version, loading
+  a dump, automatic dump editing (including VPP-path and network-drive failures), deleting the
+  DATA folder, starting or stopping VPOS, bringing a VPOS window to the front, picking a file or
+  folder in Settings — now routes through the error window instead of a plain dialog or a
+  silent failure. Minor, self-resolving notices (e.g. "closing a leftover DumpEditor.exe
+  instance") still only appear in the Status log, not as a popup.
+- The app-wide unhandled-exception handler now shows the error window (instead of silently
+  swallowing the exception) whenever it catches something that would otherwise crash the app,
+  while still preventing the crash itself.
+- Fixed a latent bug where the plain validation dialogs (e.g. "please select a version first")
+  had no `XamlRoot` set, which could make them silently fail to appear.
+
+### 0.8.5 — Fixed the User Guide window not opening
+- Fixed a crash that prevented the User Guide window from opening at all: defaulting the
+  Language combobox's selection via `IsSelected="True"` in XAML fired the language-switch
+  handler during the window's own construction, before later UI elements existed yet. The
+  default language is now applied directly, with the switch handler wired up only afterwards.
+
+### 0.8.4 — User Guide language selector & German translation
+- The User Guide window is now 1500×630 and has a "Language" selector in its title bar
+  (English / Deutsch, English by default).
+- Added a full German translation of the User Guide's features and changelog, switched
+  instantly via the Language selector — nothing is machine-translated at runtime, both
+  language versions are maintained in full.
+
+### 0.8.3 — User Guide setup disclaimer & thicker accent separator
+- Added a red disclaimer box at the top of the User Guide stating that both a DumpEditor.exe
+  path and a VPP Path must be configured under Settings for automatic dump editing, VPP
+  swapping, and everything that depends on them to work.
+- The green separator under "Automatic Dump Editing" is now 6px thick (up from 3px), so its
+  fully-rounded pill ends actually read as rounded instead of being too thin to notice.
+
+### 0.8.2 — Automatic recovery from a locked VPOSPROG.DLL
+- If VPOSPROG.DLL is still locked after clearing its read-only attribute (typically a leftover
+  DumpEditor.exe instance from an earlier, aborted run), the app now closes any running instance
+  of the configured DumpEditor.exe and retries automatically, with a status notification, before
+  giving up with an actionable error.
+
+### 0.8.1 — VPP swap & network drive reliability
+- Fixed "Access to VPOSPROG.DLL is denied" during automatic dump editing: the VPP file
+  previously installed could carry over a read-only attribute (inherited from the network
+  share) that blocks deletion even for administrators. That attribute is now cleared before
+  every delete/copy.
+- Errors for a missing/unreachable VPP path, and for the Settings window's folder picker, now
+  explain the most common cause — a mapped network drive (e.g. `K:`) that isn't visible to an
+  elevated (Run as administrator) process — and suggest running unelevated or using a full UNC
+  path instead.
+
+### 0.8.0 — DATA reset & Start Menu launch
+- Added "Delete DATA, load Dump & Start VPOS": deletes the selected version's `DATA` folder,
+  then loads the dump and starts VPOS (automatic dump editing is still evaluated as usual).
+- Added "Launch into Startmenu": starts the selected version with the `/StartMenu` parameter
+  instead of loading a dump.
+- Version section's action buttons rearranged into a 2×2 grid to fit the two new buttons.
+
+### 0.7.0 — Per-version VPP swapping & status log
+- Added automatic VPP swapping: before DumpEditor.exe runs, the VPP file matching the selected
+  VPOS version is copied in as `VPOSPROG.DLL`, with a status notification for each step.
+- Added a "VPP Path" setting (defaults to the standard network share), alongside the existing
+  DumpEditor.exe path setting.
+- The terminal panel is now labeled "Status" and shows readable status notifications ("Starting
+  VPOS...", "Loading dump and starting VPOS...", "VPOS started (PID ...)"), not just raw
+  DumpEditor.exe output.
+- The DumpEditor.exe found/not-found indicator moved from the Versions card into the Status
+  panel's header row.
+- Settings window resized to fit the new VPP Path field.
 
 ### 0.6.0 — Live DumpEditor output panel
 - Added a terminal-style panel showing DumpEditor.exe's stdout/stderr live as it runs, in the

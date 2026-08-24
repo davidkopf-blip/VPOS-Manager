@@ -1,0 +1,103 @@
+<Window
+    x:Class="DumpLoader_2._0.Views.UserGuideWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="User Guide">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid Background="{StaticResource WindowBackground}" RowDefinitions="Auto,*" RequestedTheme="Dark">
+
+        <Grid x:Name="AppTitleBar" Grid.Row="0" Height="40" Background="{StaticResource WindowBackground}" ColumnDefinitions="Auto,*,Auto">
+            <TextBlock x:Name="TitleBarText" Grid.Column="0" Text="User Guide" Foreground="{StaticResource SecondaryText}" FontSize="12" VerticalAlignment="Center" Margin="12,0,0,0" />
+
+            <!-- Language selector: a lighter-grey (CardBackground) pill sitting inside the darker
+                 title bar, positioned clear of the OS min/max/close buttons at the far right. -->
+            <Border Grid.Column="2" Background="{StaticResource CardBackground}" CornerRadius="6" Padding="10,4" Margin="0,0,140,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Language" Foreground="{StaticResource PrimaryText}" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <ComboBox x:Name="LanguageComboBox" Width="120" Height="26" FontSize="12" VerticalAlignment="Center">
+                        <ComboBoxItem Content="English" />
+                        <ComboBoxItem Content="Deutsch" />
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1" Padding="24,0,24,24">
+            <Border Background="{StaticResource CardBackground}" CornerRadius="12" Padding="0">
+                <Grid RowDefinitions="*,Auto">
+                    <ScrollViewer Grid.Row="0" Padding="24" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Spacing="20">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="OverviewHeadingText" Text="VPOS Manager — User Guide" Foreground="{StaticResource PrimaryText}" FontSize="20" FontWeight="SemiBold" />
+                                <TextBlock x:Name="OverviewBodyText" Foreground="{StaticResource SecondaryText}" TextWrapping="Wrap" />
+                            </StackPanel>
+
+                            <Border Background="{StaticResource DangerBackground}" BorderBrush="{StaticResource DangerBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="14,12">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock Text="⚠" Foreground="{StaticResource DangerText}" FontSize="18" VerticalAlignment="Top" />
+                                    <TextBlock Foreground="{StaticResource DangerText}" TextWrapping="Wrap" VerticalAlignment="Center">
+                                        <Run x:Name="DisclaimerBoldRun" Text="Required setup:" FontWeight="SemiBold" />
+                                        <Run x:Name="DisclaimerBodyRun" Text="a DumpEditor.exe path and a VPP Path must both be configured under Settings for automatic dump editing, VPP swapping, and everything that depends on them to work." />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <Rectangle Height="1" Fill="{StaticResource HairlineBrush}" />
+
+                            <!-- Features -->
+                            <StackPanel Spacing="14">
+                                <TextBlock x:Name="FeaturesLabelText" Text="FEATURES" Style="{StaticResource SectionLabelStyle}" />
+                                <ItemsControl x:Name="FeaturesItemsControl">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Spacing="4" Margin="0,0,0,14">
+                                                <TextBlock Text="{Binding Title}" Foreground="{StaticResource PrimaryText}" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding Body}" Foreground="{StaticResource SecondaryText}" TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
+                            <Rectangle Height="1" Fill="{StaticResource HairlineBrush}" />
+
+                            <!-- Changelog -->
+                            <StackPanel Spacing="14">
+                                <TextBlock x:Name="ChangelogLabelText" Text="CHANGELOG" Style="{StaticResource SectionLabelStyle}" />
+                                <ItemsControl x:Name="ChangelogItemsControl">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Spacing="4" Margin="0,0,0,14">
+                                                <TextBlock Text="{Binding Title}" Foreground="{StaticResource PrimaryText}" FontWeight="SemiBold" />
+                                                <ItemsControl ItemsSource="{Binding Entries}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Foreground="{StaticResource SecondaryText}" TextWrapping="Wrap">
+                                                                <Run Text="•" /> <Run Text="{Binding}" />
+                                                            </TextBlock>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Button x:Name="CloseButton" Grid.Row="1" Content="Close" Click="CloseButton_Click"
+                            HorizontalAlignment="Right" Style="{StaticResource PrimaryButtonStyle}"
+                            Margin="0,0,24,20" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

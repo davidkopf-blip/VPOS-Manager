@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DumpLoader_2._0.Services;
 
 namespace DumpLoader_2._0.ViewModels
 {
@@ -71,7 +72,8 @@ namespace DumpLoader_2._0.ViewModels
             }
             catch (Exception ex)
             {
-                return _showMessageAsync($"Fehler beim Aktivieren des Fensters: {ex.Message}");
+                ErrorReportingService.ShowError($"Fehler beim Aktivieren des Fensters: {ex.Message}", ex, "Fenster konnte nicht aktiviert werden");
+                return Task.CompletedTask;
             }
         }
 
@@ -101,7 +103,7 @@ namespace DumpLoader_2._0.ViewModels
             }
             catch (Exception ex)
             {
-                await _showMessageAsync($"Fehler beim Beenden des Prozesses: {ex.Message}");
+                ErrorReportingService.ShowError($"Fehler beim Beenden des Prozesses: {ex.Message}", ex, "Prozess konnte nicht beendet werden");
             }
             finally
             {

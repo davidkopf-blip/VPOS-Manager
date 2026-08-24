@@ -139,11 +139,27 @@ namespace DumpLoader_2._0.Views
             await _viewModel.StartVposWithoutDumpCommand.ExecuteAsync(null);
         }
 
+        private async void DeleteDataStartVposButton_Click(object sender, RoutedEventArgs e)
+        {
+            await _viewModel.DeleteDataLoadDumpAndStartVposCommand.ExecuteAsync(null);
+        }
+
+        private async void LaunchIntoStartMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            await _viewModel.LaunchIntoStartMenuCommand.ExecuteAsync(null);
+        }
+
         private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var settingsWindow = new SettingsWindow(_viewModel);
             settingsWindow.Closed += (_, _) => UpdateDumpEditorStatus();
             settingsWindow.Activate();
+        }
+
+        private void UserGuideMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var userGuideWindow = new UserGuideWindow();
+            userGuideWindow.Activate();
         }
 
         private async void AboutMenuItem_Click(object sender, RoutedEventArgs e)

@@ -24,6 +24,7 @@
                     <MenuFlyoutItem Text="Open Settings..." Click="SettingsMenuItem_Click" />
                 </MenuBarItem>
                 <MenuBarItem Title="Help">
+                    <MenuFlyoutItem Text="User Guide" Click="UserGuideMenuItem_Click" />
                     <MenuFlyoutItem Text="About VPOS Manager" Click="AboutMenuItem_Click" />
                 </MenuBarItem>
             </MenuBar>
@@ -39,19 +40,10 @@
                         <TextBlock Text="Versions" Foreground="{StaticResource PrimaryText}" FontSize="18" FontWeight="SemiBold" />
 
                         <!-- Row 1 -->
-                        <Grid ColumnDefinitions="Auto,*">
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                                <ComboBox x:Name="VersionsComboBox" Width="220" ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}" DisplayMemberPath="Version" />
-                                <Button x:Name="AddVersionButton" Content="Add Version" Click="AddVersionButton_Click" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <Grid Width="13" Height="13" VerticalAlignment="Center">
-                                    <Ellipse x:Name="MainStatusHaloEllipse" Width="13" Height="13" />
-                                    <Ellipse x:Name="MainStatusDotEllipse" Width="7" Height="7" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </Grid>
-                                <TextBlock x:Name="MainStatusText" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ComboBox x:Name="VersionsComboBox" Width="220" ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}" DisplayMemberPath="Version" />
+                            <Button x:Name="AddVersionButton" Content="Add Version" Click="AddVersionButton_Click" />
+                        </StackPanel>
 
                         <!-- Row 2 -->
                         <StackPanel Orientation="Horizontal" Spacing="8">
@@ -60,9 +52,11 @@
                         </StackPanel>
 
                         <!-- Row 3 -->
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <Button x:Name="StartVposButton" Grid.Column="0" Click="StartVposButton_Click" Content="Load Dump and Start VPOS" HorizontalAlignment="Stretch" Style="{StaticResource LargePrimaryButtonStyle}" />
-                            <Button x:Name="StartVposOnlyButton" Grid.Column="1" Click="StartVposOnlyButton_Click" Content="Start VPOS" HorizontalAlignment="Stretch" Style="{StaticResource LargeButtonStyle}" />
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                            <Button x:Name="StartVposButton" Grid.Row="0" Grid.Column="0" Click="StartVposButton_Click" Content="Load Dump and Start VPOS" HorizontalAlignment="Stretch" Style="{StaticResource LargePrimaryButtonStyle}" />
+                            <Button x:Name="DeleteDataStartVposButton" Grid.Row="0" Grid.Column="1" Click="DeleteDataStartVposButton_Click" Content="Delete DATA, load Dump &amp; Start VPOS" HorizontalAlignment="Stretch" Style="{StaticResource LargePrimaryButtonStyle}" />
+                            <Button x:Name="LaunchIntoStartMenuButton" Grid.Row="1" Grid.Column="0" Click="LaunchIntoStartMenuButton_Click" Content="Launch into Startmenu" HorizontalAlignment="Stretch" Style="{StaticResource LargeButtonStyle}" />
+                            <Button x:Name="StartVposOnlyButton" Grid.Row="1" Grid.Column="1" Click="StartVposOnlyButton_Click" Content="Start VPOS" HorizontalAlignment="Stretch" Style="{StaticResource LargeButtonStyle}" />
                         </Grid>
                     </StackPanel>
                 </Border>
@@ -75,7 +69,7 @@
                             <ToggleSwitch Grid.Column="1" IsOn="{Binding Options.AutomaticDumpEditing, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="40" HorizontalAlignment="Right" />
                         </Grid>
 
-                        <Rectangle Height="3" RadiusX="1.5" RadiusY="1.5" Fill="{StaticResource PrimaryAccent}" />
+                        <Rectangle Height="6" RadiusX="3" RadiusY="3" Fill="{StaticResource PrimaryAccent}" />
 
                         <StackPanel Spacing="12">
                             <TextBlock Text="GENERAL SETTINGS" Style="{StaticResource SectionLabelStyle}" />
@@ -139,7 +133,16 @@
                      two read as visually distinct layers. -->
                 <Border Grid.Row="2" Background="{StaticResource CardBackground}" CornerRadius="12" Padding="16">
                     <Grid RowDefinitions="Auto,12,*">
-                        <TextBlock Grid.Row="0" Text="DumpEditor Output" Foreground="{StaticResource PrimaryText}" FontSize="14" FontWeight="SemiBold" />
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Status" Foreground="{StaticResource PrimaryText}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Grid Width="13" Height="13" VerticalAlignment="Center">
+                                    <Ellipse x:Name="MainStatusHaloEllipse" Width="13" Height="13" />
+                                    <Ellipse x:Name="MainStatusDotEllipse" Width="7" Height="7" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <TextBlock x:Name="MainStatusText" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
 
                         <Border Grid.Row="2" Background="{StaticResource TerminalBackground}" CornerRadius="8" Padding="12">
                             <ScrollViewer x:Name="TerminalScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">

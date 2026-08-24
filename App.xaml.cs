@@ -58,6 +58,13 @@ namespace DumpLoader_2._0
 
             // ensure session files/folder exist (timestamped log files)
             DumpLoader_2._0.Services.SessionFiles.InitializeSessionFiles();
+
+            // Lets ErrorReportingService.ShowError marshal onto the UI thread from anywhere,
+            // including these very exception handlers. The App constructor always runs on the UI
+            // thread, which already has a DispatcherQueue by this point in WinUI 3.
+            var dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+            if (dispatcherQueue != null)
+                DumpLoader_2._0.Services.ErrorReportingService.Initialize(dispatcherQueue);
         }
 
         /// <summary>
@@ -93,8 +100,18 @@ namespace DumpLoader_2._0
             catch { }
 
             // Without this, any unhandled exception on the UI thread (even from a single bad
-            // event handler) takes down the entire process. We log it above; mark it handled so
-            // a non-fatal UI bug doesn't kill the whole app.
+            // event handler) takes down the entire process. We log it above, surface it to the
+            // user via the app-styled error window, and mark it handled so a non-fatal bug
+            // doesn't kill the whole app.
+            try
+            {
+                DumpLoader_2._0.Services.ErrorReportingService.ShowError(
+                    "Ein unerwarteter Fehler ist aufgetreten. VPOS Manager konnte weiterlaufen; Details wurden protokolliert.",
+                    e.Exception,
+                    "Unerwarteter Fehler");
+            }
+            catch { }
+
             e.Handled = true;
         }
 
@@ -103,7 +120,18 @@ namespace DumpLoader_2._0
             try
             {
                 if (e.ExceptionObject is Exception ex)
+                {
                     LogStartupException(ex, "CurrentDomain.UnhandledException");
+
+                    // This handler fires for exceptions that escaped a non-UI thread entirely -
+                    // by the time we get here the process is almost always already terminating
+                    // (e.IsTerminating), so this is best-effort only: logging above is the part
+                    // that reliably survives.
+                    DumpLoader_2._0.Services.ErrorReportingService.ShowError(
+                        "Ein schwerwiegender Fehler ist auf einem Hintergrundthread aufgetreten.",
+                        ex,
+                        "Kritischer Fehler");
+                }
             }
             catch { }
         }
@@ -113,6 +141,8 @@ namespace DumpLoader_2._0
             try
             {
                 LogStartupException(e.Exception, "TaskScheduler.UnobservedTaskException");
+                // Mark observed so the finalizer thread doesn't also crash the process over this.
+                e.SetObserved();
             }
             catch { }
         }

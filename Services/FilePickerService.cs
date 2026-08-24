@@ -44,6 +44,31 @@ namespace DumpLoader_2._0.Services
             }
         }
 
+        public async Task<string?> PickFolderAsync(Window window)
+        {
+            try
+            {
+                var picker = new FolderPicker();
+                InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(window));
+                picker.FileTypeFilter.Add("*");
+                StorageFolder? folder = await picker.PickSingleFolderAsync();
+                return folder?.Path;
+            }
+            catch (Exception ex)
+            {
+                // The shell folder picker throws for various vague COM reasons when navigating to
+                // an unreachable/slow network location - most commonly a mapped drive letter that
+                // isn't visible to the current process (e.g. because it's running elevated, which
+                // uses a different logon-session token than the one the mapping was created
+                // under). Re-throw with an actionable hint instead of the raw COM error text.
+                throw new InvalidOperationException(
+                    "Der Ordner konnte nicht ausgewählt werden. Dies passiert häufig bei Netzlaufwerken " +
+                    "(z. B. K:), die für elevierte (als Administrator ausgeführte) Prozesse nicht sichtbar " +
+                    "sind - starten Sie VPOS Manager ohne Administratorrechte, oder geben Sie stattdessen " +
+                    "den vollständigen UNC-Netzwerkpfad an (z. B. \\\\server\\freigabe\\...).", ex);
+            }
+        }
+
         public async Task<string?> PickDumpAsync(Window window)
         {
             var picker = new FileOpenPicker();

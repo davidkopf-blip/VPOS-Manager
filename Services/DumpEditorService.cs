@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -32,7 +33,7 @@ namespace DumpLoader_2._0.Services
         /// <summary>Fires for each line DumpEditor.exe writes to stdout or stderr, in order.</summary>
         public event Action<string>? OutputReceived;
 
-        public async Task<string> CreateEditedDumpAsync(string dumpEditorExePath, string sourceDumpPath, DumpModificationOptions options)
+        public async Task<string> CreateEditedDumpAsync(string dumpEditorExePath, string sourceDumpPath, DumpModificationOptions options, string? version, string? vppFolderPath)
         {
             if (string.IsNullOrEmpty(dumpEditorExePath))
                 throw new ArgumentException("Der Pfad zu DumpEditor.exe ist nicht gesetzt. Bitte in den Einstellungen konfigurieren.", nameof(dumpEditorExePath));
@@ -46,6 +47,8 @@ namespace DumpLoader_2._0.Services
             var dumpEditorRoot = Path.GetDirectoryName(Path.GetFullPath(dumpEditorExePath));
             if (string.IsNullOrEmpty(dumpEditorRoot))
                 throw new InvalidOperationException("Das Verzeichnis von DumpEditor.exe konnte nicht ermittelt werden.");
+
+            await InstallVppForVersionAsync(dumpEditorExePath, dumpEditorRoot, version, vppFolderPath);
 
             var workFolder = Path.Combine(dumpEditorRoot, WorkFolderName);
             Directory.CreateDirectory(workFolder);
@@ -90,6 +93,161 @@ namespace DumpLoader_2._0.Services
                 throw new FileNotFoundException("DumpEditor hat keine bearbeitete Dump-Datei erzeugt.", supportDumpOutputPath);
 
             return supportDumpOutputPath;
+        }
+
+        /// <summary>
+        /// DIG loads each VPOS version's PC dump through a version-specific "VPOSPROG.DLL" that
+        /// actually ships as "VPP-{Version}.VPP" files in a shared folder. Before every run, the
+        /// file matching the currently selected version is copied over the previous
+        /// VPOSPROG.DLL next to DumpEditor.exe, so DIG always loads the dump with the matching
+        /// program logic.
+        /// </summary>
+        private async Task InstallVppForVersionAsync(string dumpEditorExePath, string dumpEditorRoot, string? version, string? vppFolderPath)
+        {
+            if (string.IsNullOrEmpty(version))
+                throw new InvalidOperationException("Es ist keine VPOS-Version ausgewählt, das passende VPP kann nicht ermittelt werden.");
+
+            if (string.IsNullOrEmpty(vppFolderPath))
+                throw new InvalidOperationException("Der VPP-Pfad ist nicht konfiguriert. Bitte in den Einstellungen festlegen.");
+
+            if (!Directory.Exists(vppFolderPath))
+            {
+                // The single most common cause of a mapped network drive (e.g. "K:") suddenly
+                // "not existing": drive mappings are tied to the logon session token that created
+                // them, and elevating a process (Run as administrator / a UAC-elevated launch)
+                // gives it a *different* token that never saw that mapping - so the same drive
+                // letter that works fine unelevated reports as missing entirely.
+                var hint = IsRunningElevated()
+                    ? " VPOS Manager läuft aktuell mit erhöhten Rechten (als Administrator) - zugeordnete Netzlaufwerke des normalen Benutzerkontos sind für elevierte Prozesse nicht sichtbar. Bitte ohne Administratorrechte starten, oder stattdessen den vollständigen UNC-Netzwerkpfad verwenden (z. B. \\\\server\\freigabe\\...)."
+                    : " Prüfen Sie, ob das Laufwerk verbunden ist bzw. die Netzwerkverbindung besteht.";
+                throw new DirectoryNotFoundException($"Der VPP-Pfad wurde nicht gefunden: {vppFolderPath}.{hint}");
+            }
+
+            var vppFileName = $"VPP-{version}.VPP";
+            var vppSourcePath = Path.Combine(vppFolderPath, vppFileName);
+            if (!File.Exists(vppSourcePath))
+                throw new FileNotFoundException($"Kein passendes VPP für Version {version} gefunden ({vppFileName}).", vppSourcePath);
+
+            OutputReceived?.Invoke($"Installing {vppFileName} for version {version}...");
+
+            var vposprogDllPath = Path.Combine(dumpEditorRoot, "VPOSPROG.DLL");
+            if (File.Exists(vposprogDllPath))
+            {
+                // NTFS refuses to delete a file with the ReadOnly attribute set, regardless of
+                // the caller's privileges - even an administrator gets "Access denied". VPP files
+                // copied in from a read-only network share carry that attribute over, so every
+                // run after the first would otherwise fail here. Clear it defensively before
+                // deleting.
+                ClearReadOnlyAttribute(vposprogDllPath);
+
+                await DeleteWithRetryAsync(vposprogDllPath, dumpEditorExePath);
+            }
+
+            File.Copy(vppSourcePath, vposprogDllPath);
+
+            // Also clear it on the freshly copied file, so the *next* run's delete above doesn't
+            // hit the same problem again.
+            ClearReadOnlyAttribute(vposprogDllPath);
+
+            OutputReceived?.Invoke("VPP installed.");
+        }
+
+        /// <summary>
+        /// Deletes VPOSPROG.DLL, retrying once after closing any leftover DumpEditor.exe instance
+        /// still holding it open. .NET maps "file is locked by another process" to
+        /// UnauthorizedAccessException (not IOException, as its message would suggest) via
+        /// DeleteFile's ERROR_ACCESS_DENIED - so a lingering instance from a previous, aborted run
+        /// looks identical to a genuine permissions problem until this narrows it down.
+        /// </summary>
+        private async Task DeleteWithRetryAsync(string path, string dumpEditorExePath)
+        {
+            const int maxAttempts = 3;
+            for (var attempt = 1; attempt <= maxAttempts; attempt++)
+            {
+                try
+                {
+                    File.Delete(path);
+                    return;
+                }
+                catch (UnauthorizedAccessException) when (attempt < maxAttempts)
+                {
+                    if (attempt == 1)
+                    {
+                        OutputReceived?.Invoke("VPOSPROG.DLL is in use - closing any running DumpEditor.exe instance...");
+                        CloseRunningInstances(dumpEditorExePath);
+                    }
+                    await Task.Delay(500);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    throw new UnauthorizedAccessException(
+                        $"Zugriff auf \"{path}\" verweigert. Die Datei wird vermutlich von einem laufenden " +
+                        "DumpEditor.exe- oder VPOSPC.exe-Prozess verwendet, der nicht automatisch geschlossen " +
+                        "werden konnte. Bitte alle laufenden Instanzen manuell schließen und erneut versuchen.",
+                        ex);
+                }
+            }
+        }
+
+        /// <summary>Closes any running instance of the exact configured DumpEditor.exe (matched by
+        /// full module path, not just process name, so an unrelated same-named process elsewhere
+        /// is never touched).</summary>
+        private static void CloseRunningInstances(string exePath)
+        {
+            try
+            {
+                var processName = Path.GetFileNameWithoutExtension(exePath);
+                var fullPath = Path.GetFullPath(exePath);
+
+                foreach (var proc in Process.GetProcessesByName(processName))
+                {
+                    using (proc)
+                    {
+                        try
+                        {
+                            string? modulePath = null;
+                            try { modulePath = proc.MainModule?.FileName; } catch { /* denied reading another process's module info - fall back to name match below */ }
+
+                            if (modulePath == null || string.Equals(modulePath, fullPath, StringComparison.OrdinalIgnoreCase))
+                            {
+                                proc.Kill();
+                                proc.WaitForExit(3000);
+                            }
+                        }
+                        catch { /* best effort */ }
+                    }
+                }
+            }
+            catch { /* best effort */ }
+        }
+
+        private static void ClearReadOnlyAttribute(string path)
+        {
+            try
+            {
+                var attributes = File.GetAttributes(path);
+                if ((attributes & FileAttributes.ReadOnly) != 0)
+                    File.SetAttributes(path, attributes & ~FileAttributes.ReadOnly);
+            }
+            catch
+            {
+                // Best effort - if this fails, the delete/copy right after will surface whatever
+                // the real problem is.
+            }
+        }
+
+        private static bool IsRunningElevated()
+        {
+            try
+            {
+                using var identity = WindowsIdentity.GetCurrent();
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
