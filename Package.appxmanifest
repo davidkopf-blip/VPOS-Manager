@@ -10,17 +10,17 @@
     IgnorableNamespaces="uap uap18 desktop rescap">
 
 	<Identity
-        Name="87c2f37e-ff5e-40a0-a728-1a9fd1ee184d"
-        Publisher="CN=David Kopf"
-        Version="0.8.4.0" />
+        Name="DK.Software.VPOSManager"
+        Publisher="CN=932EC8A3-2CA6-48C1-888C-2A1CF594AF44"
+        Version="1.0.0.0" />
 
 	<mp:PhoneIdentity
-        PhoneProductId="87c2f37e-ff5e-40a0-a728-1a9fd1ee184d"
+        PhoneProductId="78b2b957-96d4-4acf-99fc-52ebc673248e"
         PhonePublisherId="00000000-0000-0000-0000-000000000000" />
 
 	<Properties>
 		<DisplayName>VPOS Manager</DisplayName>
-		<PublisherDisplayName>David Kopf</PublisherDisplayName>
+		<PublisherDisplayName>DK.Software</PublisherDisplayName>
 		<Logo>Assets\StoreLogo.png</Logo>
 	</Properties>
 

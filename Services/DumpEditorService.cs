@@ -298,6 +298,16 @@ namespace DumpLoader_2._0.Services
                 root.Add(DirectAccess("780", "1", "1", "2", "0"));
                 root.Add(DirectAccess("780", "1", "1", "12", "0"));
             }
+            else if (options.EnableVectronConnect)
+            {
+                // Writes the same three addresses as DisableVectronConnect above, with opposite
+                // intent - MainViewModel refuses to run automatic dump editing if both checkboxes
+                // are on at once, so this "else" is a defensive backstop, not the primary guard.
+                root.Add(new XComment(" Enable VectronConnect "));
+                root.Add(DirectAccess("780", "1", "1", "12", "1"));
+                root.Add(DirectAccess("780", "1", "1", "1", options.VectronConnectId ?? string.Empty));
+                root.Add(DirectAccess("780", "1", "1", "2", options.VectronConnectPassword ?? string.Empty));
+            }
 
             if (options.DisableLicenseCheck)
             {
@@ -309,6 +319,18 @@ namespace DumpLoader_2._0.Services
             {
                 root.Add(new XComment(" Disable bonVito "));
                 root.Add(DirectAccess("532", "1", "1", "8", "0"));
+            }
+
+            if (options.DisableKeyboardSound)
+            {
+                root.Add(new XComment(" Disable keyboard sound "));
+                root.Add(DirectAccess("3", "1", "1", "20", "0"));
+            }
+
+            if (options.DisableErrorSound)
+            {
+                root.Add(new XComment(" Disable error sound "));
+                root.Add(DirectAccess("3", "1", "1", "23", "0"));
             }
 
             if (options.MyVectronUsernameEnabled)
@@ -329,9 +351,68 @@ namespace DumpLoader_2._0.Services
             root.Add(DirectAccess("33", "1", "524", "1", serverValue));
             root.Add(DirectAccess("33", "1", "589", "1", serverValue));
 
+            // Prerequisite for any of the interface 18/19/20 edits below - shared, so only emit it
+            // once regardless of how many of the three are actually in use.
+            if (options.SetTcpIpInterface20 || options.SetTcpIpInterface19 || options.AddShift4TerminalToInterface18)
+            {
+                root.Add(new XComment(" Allow up to 20 interfaces "));
+                root.Add(DirectAccess("7", "1", "1", "248", "20"));
+            }
+
+            if (options.SetTcpIpInterface20)
+            {
+                root.Add(new XComment(" Set Interface 20 to TCP/IP (PRINTER) - printer routing "));
+                root.Add(DirectAccess("441", "1", "20", "1", "PRINTER"));
+                root.Add(DirectAccess("441", "1", "20", "2", "6")); // TCP/IP
+                root.Add(DirectAccess("441", "1", "20", "23", "9100")); // fixed port, not user-configurable
+                WriteIpv4Bytes(root, "20", options.Interface20IpAddress);
+
+                if (options.SetAllPrintersToInterface)
+                {
+                    root.Add(new XComment(" Set all 10 printers to Interface 20 "));
+                    var driverNumber = options.PrinterDriverNumber ?? "20";
+                    for (var printerNo = 1; printerNo <= 10; printerNo++)
+                    {
+                        var recPos = printerNo.ToString();
+                        root.Add(DirectAccess("56", "1", recPos, "5", "20")); // interface
+                        root.Add(DirectAccess("56", "1", recPos, "3", "1")); // enable programmed driver
+                        root.Add(DirectAccess("56", "1", recPos, "2", driverNumber)); // driver number
+                    }
+                }
+            }
+
+            if (options.SetTcpIpInterface19)
+            {
+                root.Add(new XComment(" Set Interface 19 to TCP/IP (TERMINAL) - PAX, Verifone & MobileApp routing "));
+                root.Add(DirectAccess("441", "1", "19", "1", "TERMINAL"));
+                root.Add(DirectAccess("441", "1", "19", "2", "6")); // TCP/IP
+                root.Add(DirectAccess("441", "1", "19", "23", "8085")); // fixed port, not user-configurable
+                WriteIpv4Bytes(root, "19", options.Interface19IpAddress);
+            }
+
+            if (options.AddShift4TerminalToInterface18)
+            {
+                root.Add(new XComment(" Add Shift4 Terminal to Interface 18 (for printing) "));
+                root.Add(DirectAccess("441", "1", "18", "1", "TERMDRUCK"));
+                root.Add(DirectAccess("441", "1", "18", "2", "9"));
+            }
+
             var doc = new XDocument(new XDeclaration("1.0", "utf-8", null), root);
             using var writer = new StreamWriter(path, false, new UTF8Encoding(false));
             doc.Save(writer);
+        }
+
+        /// <summary>IPv4 is stored as four separate byte fields, always at FieldNo 19-22 of the
+        /// given interface's RecPos (441/1/{interfaceRecPos}/19..22).</summary>
+        private static void WriteIpv4Bytes(XElement root, string interfaceRecPos, string? ipAddress)
+        {
+            var parts = (ipAddress ?? string.Empty).Split('.');
+            for (var i = 0; i < 4; i++)
+            {
+                var fieldNo = (19 + i).ToString();
+                var value = i < parts.Length ? parts[i] : "0";
+                root.Add(DirectAccess("441", "1", interfaceRecPos, fieldNo, value));
+            }
         }
 
         private static XElement DirectAccess(string tableNo, string planeNo, string recPos, string fieldNo, string data)

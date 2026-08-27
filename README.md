@@ -31,14 +31,31 @@ toggles:
 - Disable myVectron
 - Disable VectronConnect
 - Disable bonVito
+- Disable keyboard sound
+- Disable error sound
 
 Before DumpEditor.exe runs, the app also swaps in the VPP program file matching the selected VPOS
 version (`VPP-{Version}.VPP` from the configured VPP Path, copied in as `VPOSPROG.DLL`), so the
 dump is always edited with the correct version's program logic.
 
-**myVectron overrides**
+**myVectron & VectronConnect**
 Bake a specific myVectron username/password into the dump before launch, and flip a single switch
-to point VectronConnect and myVectron at the Test or Prod server environment.
+to point VectronConnect and myVectron at the Test or Prod server environment. Check "Save
+credentials" to remember them between sessions (stored in plain text in `settings.json`, with a
+one-time warning). Alongside it, an independent "VectronConnect" section can enable VectronConnect
+outright with a Connect ID and password, with its own matching "Save credentials" checkbox and
+warning — mutually exclusive with "Disable VectronConnect" above, since both configure the same
+underlying setting; VPOS Manager refuses to run automatic dump editing if both are checked.
+
+**Printer (TCP/IP) & PAX, Verifone and MobileApp**
+"Set interface 20 to TCP/IP" registers a TCP/IP interface (named `PRINTER`, fixed port 9100)
+at the IPv4 address you enter, required and validated before any load-dump action runs while this
+is checked. With it on, "Set all printers to this interface" points all 10 printer driver slots
+at interface 20 with a programmed driver enabled, using a driver number (1-20, 20 by default)
+also validated before use. Separately, "Set interface 19 to TCP/IP" registers interface 19 (named
+`TERMINAL`, fixed port 8085) for PAX/Verifone/MobileApp routing at its own IPv4 address, and "Add
+Shift4 Terminal to Interface 18 (for printing)" retypes interface 18 for that purpose — no
+IP/port needed for that one.
 
 **Status log**
 A live status panel shows what's happening as a dump loads and VPOS starts — from "Loading dump
@@ -57,6 +74,33 @@ Registered versions, the last-used dump path, and every toggle above are saved b
 Startup errors and key actions are logged to timestamped files for troubleshooting.
 
 ## Changelog
+
+### 1.0.0 — VectronConnect, PAX/Verifone/MobileApp routing & sound toggles
+- Added "Disable keyboard sound" and "Disable error sound" to General Settings.
+- Added an independent "VectronConnect" section (split 50/50 next to myVectron): a checkbox plus
+  Connect ID and VC Password fields that enable VectronConnect outright. Mutually exclusive with
+  "Disable VectronConnect" — both write to the same underlying setting, so automatic dump editing
+  now refuses to run if both are checked, with an explanatory error.
+- "Interface 20 (TCP/IP)" is now "Printer (TCP/IP)", split 50/50 with a new "PAX, Verifone &
+  MobileApp" section: "Set interface 19 to TCP/IP" (fixed port 8085) plus its own IPv4 field, and
+  "Add Shift4 Terminal to Interface 18 (for printing)" (no IP/port needed).
+- Interface 20's port field was removed — it's now fixed at 9100 and shown as read-only text
+  beside the IP field, matching interface 19's fixed-port treatment.
+- The title bar now shows the copyright line ("VPOS Manager © David Kopf · DIG © Volker Görgler")
+  and the app's version number, right-bound, read from the assembly version so it never needs to
+  be hand-typed — only bumped once, in the `.csproj`'s `<Version>`.
+- Renamed myVectron's "Save Username & Password" checkbox to "Save credentials", and added a
+  matching "Save credentials" checkbox (with the same one-time cleartext-storage warning) to the
+  new VectronConnect section, gating its Connect ID/password persistence the same way.
+- Interface 20's registered name (`441/1/20/1`) changed from `VPOSMANAGER` to `PRINTER`.
+
+### 0.9.1 — Interface 20 (TCP/IP) & printer driver editing
+- Added "Set interface 20 to TCP/IP": registers a new TCP/IP interface named `VPOSMANAGER` at a
+  chosen IPv4 address and port. Both fields are required and validated (valid IPv4, port 1-65535)
+  before any load-dump action can run while automatic dump editing and this checkbox are on.
+- Added "Set all printers to this interface" (only available while the interface checkbox above
+  is on): points all 10 printers at interface 20 with a programmed driver enabled, using a driver
+  number field (1-20, defaults to 20, also validated before use).
 
 ### 0.9.0 — App-wide error handling & crash safety
 - Added a new app-styled error window (`ErrorWindow`), replacing the default unstyled

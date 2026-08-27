@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -38,6 +39,7 @@ namespace DumpLoader_2._0.Views
             }
 
             SetUpCustomTitleBar();
+            SetUpVersionAndCopyright();
 
             // Covers the initial load (settings load asynchronously after the constructor
             // returns) and any change made from the Settings window, since it mutates this same
@@ -114,6 +116,18 @@ namespace DumpLoader_2._0.Views
             titleBar.ButtonPressedForegroundColor = Colors.White;
         }
 
+        /// <summary>
+        /// Version number comes from the assembly's own version (kept in sync with
+        /// Package.appxmanifest's Identity/@Version in the .csproj's &lt;Version&gt;), so it never
+        /// needs to be hand-typed here - only bumped in one place per release.
+        /// </summary>
+        private void SetUpVersionAndCopyright()
+        {
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            VersionText.Text = version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : string.Empty;
+            CopyrightText.Text = "VPOS Manager © David Kopf · DIG © Volker Görgler";
+        }
+
         private void ScrollToBottomButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
             LeftScrollViewer.ChangeView(null, LeftScrollViewer.ScrollableHeight, null);
@@ -176,10 +190,23 @@ namespace DumpLoader_2._0.Views
 
         private async void SaveCredentialsCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            // Click (unlike Checked/Unchecked) only fires for genuine user interaction, never
-            // for the programmatic IsChecked change that happens when a previously-saved "true"
-            // is restored from settings.json at startup - at which point the window may not even
-            // have a XamlRoot yet, which would crash ShowAsync().
+            await ShowCleartextStorageWarningIfChecked(sender);
+        }
+
+        private async void SaveVectronConnectCredentialsCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            await ShowCleartextStorageWarningIfChecked(sender);
+        }
+
+        /// <summary>
+        /// Shared one-time cleartext-storage disclaimer for every "Save credentials" checkbox
+        /// (myVectron and VectronConnect alike). Click (unlike Checked/Unchecked) only fires for
+        /// genuine user interaction, never for the programmatic IsChecked change that happens
+        /// when a previously-saved "true" is restored from settings.json at startup - at which
+        /// point the window may not even have a XamlRoot yet, which would crash ShowAsync().
+        /// </summary>
+        private async Task ShowCleartextStorageWarningIfChecked(object sender)
+        {
             if (sender is not CheckBox { IsChecked: true })
                 return;
 
@@ -203,6 +230,12 @@ namespace DumpLoader_2._0.Views
             {
                 _viewModel.Options.MyVectronUsername = MyVectronUsernameTextBox.Text;
                 _viewModel.Options.MyVectronPassword = MyVectronPasswordBox.Password;
+            }
+
+            if (_viewModel.Options.SaveVectronConnectCredentials)
+            {
+                _viewModel.Options.VectronConnectId = VectronConnectIdTextBox.Text;
+                _viewModel.Options.VectronConnectPassword = VectronConnectPasswordBox.Password;
             }
 
             // Synchronous on purpose: blocking on the async save here (e.g. via

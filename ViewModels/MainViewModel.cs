@@ -87,6 +87,12 @@ namespace DumpLoader_2._0.ViewModels
             });
         }
 
+        private static bool IsValidIPv4(string? address)
+        {
+            return System.Net.IPAddress.TryParse(address, out var parsed) &&
+                   parsed.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork;
+        }
+
         private readonly Window _window;
 
         public MainViewModel(Window window, string? initialDumpPath = null)
@@ -161,6 +167,19 @@ namespace DumpLoader_2._0.ViewModels
             Options.MyVectronPassword = settings.Options.MyVectronPassword;
             Options.SaveMyVectronCredentials = settings.Options.SaveMyVectronCredentials;
             Options.IsTestServer = settings.Options.IsTestServer;
+            Options.SetTcpIpInterface20 = settings.Options.SetTcpIpInterface20;
+            Options.Interface20IpAddress = settings.Options.Interface20IpAddress;
+            Options.SetAllPrintersToInterface = settings.Options.SetAllPrintersToInterface;
+            Options.PrinterDriverNumber = settings.Options.PrinterDriverNumber ?? "20";
+            Options.DisableKeyboardSound = settings.Options.DisableKeyboardSound;
+            Options.DisableErrorSound = settings.Options.DisableErrorSound;
+            Options.EnableVectronConnect = settings.Options.EnableVectronConnect;
+            Options.VectronConnectId = settings.Options.VectronConnectId;
+            Options.VectronConnectPassword = settings.Options.VectronConnectPassword;
+            Options.SaveVectronConnectCredentials = settings.Options.SaveVectronConnectCredentials;
+            Options.SetTcpIpInterface19 = settings.Options.SetTcpIpInterface19;
+            Options.Interface19IpAddress = settings.Options.Interface19IpAddress;
+            Options.AddShift4TerminalToInterface18 = settings.Options.AddShift4TerminalToInterface18;
 
             DumpEditorExePath = settings.DumpEditorExePath;
             VppFolderPath = settings.VppFolderPath;
@@ -328,6 +347,43 @@ namespace DumpLoader_2._0.ViewModels
                         return;
                     }
 
+                    if (Options.DisableVectronConnect && Options.EnableVectronConnect)
+                    {
+                        AppendStatus("Disable VectronConnect and VectronConnect are both checked - aborted.");
+                        ErrorReportingService.ShowError("\"Disable VectronConnect\" und \"VectronConnect\" können nicht gleichzeitig aktiviert sein.", title: "Widersprüchliche VectronConnect-Einstellung");
+                        return;
+                    }
+
+                    if (Options.SetTcpIpInterface20 && !IsValidIPv4(Options.Interface20IpAddress))
+                    {
+                        AppendStatus("Invalid IPv4 address for Interface 20 - aborted.");
+                        ErrorReportingService.ShowError("Bitte eine gültige IPv4-Adresse für Interface 20 angeben (z. B. 192.168.1.100).", title: "Ungültige IP-Adresse");
+                        return;
+                    }
+
+                    if (Options.SetTcpIpInterface20 && Options.SetAllPrintersToInterface &&
+                        (!int.TryParse(Options.PrinterDriverNumber, out var driverNo) || driverNo < 1 || driverNo > 20))
+                    {
+                        AppendStatus("Invalid printer driver number - aborted.");
+                        ErrorReportingService.ShowError("Bitte eine gültige Treibernummer (1-20) für die Drucker angeben.", title: "Ungültige Treibernummer");
+                        return;
+                    }
+
+                    if (Options.SetTcpIpInterface19 && !IsValidIPv4(Options.Interface19IpAddress))
+                    {
+                        AppendStatus("Invalid IPv4 address for Interface 19 - aborted.");
+                        ErrorReportingService.ShowError("Bitte eine gültige IPv4-Adresse für Interface 19 angeben (z. B. 192.168.1.100).", title: "Ungültige IP-Adresse");
+                        return;
+                    }
+
+                    if (Options.EnableVectronConnect &&
+                        (string.IsNullOrWhiteSpace(Options.VectronConnectId) || string.IsNullOrWhiteSpace(Options.VectronConnectPassword)))
+                    {
+                        AppendStatus("VectronConnect Connect ID/password missing - aborted.");
+                        ErrorReportingService.ShowError("Bitte Connect ID und VC Password für VectronConnect angeben.", title: "VectronConnect-Zugangsdaten fehlen");
+                        return;
+                    }
+
                     LogAction("ExecuteStartVposAsync: running DumpEditor for automatic dump editing");
                     AppendStatus("Running DumpEditor to apply dump modifications...");
                     try
@@ -406,7 +462,8 @@ namespace DumpLoader_2._0.ViewModels
         /// Builds the DumpModificationOptions instance that actually gets written to
         /// settings.json. This is a snapshot copy, never the live Options object bound to the UI -
         /// mutating that directly here would wipe out whatever the user is currently typing.
-        /// myVectron username/password are only included when SaveMyVectronCredentials is on;
+        /// myVectron username/password are only included when SaveMyVectronCredentials is on, and
+        /// VectronConnect's Connect ID/password only when SaveVectronConnectCredentials is on;
         /// otherwise they stay in-memory for this session only and are never persisted.
         /// </summary>
         private DumpModificationOptions BuildOptionsForPersistence()
@@ -425,6 +482,19 @@ namespace DumpLoader_2._0.ViewModels
                 MyVectronUsername = Options.SaveMyVectronCredentials ? Options.MyVectronUsername : null,
                 MyVectronPassword = Options.SaveMyVectronCredentials ? Options.MyVectronPassword : null,
                 IsTestServer = Options.IsTestServer,
+                SetTcpIpInterface20 = Options.SetTcpIpInterface20,
+                Interface20IpAddress = Options.Interface20IpAddress,
+                SetAllPrintersToInterface = Options.SetAllPrintersToInterface,
+                PrinterDriverNumber = Options.PrinterDriverNumber,
+                DisableKeyboardSound = Options.DisableKeyboardSound,
+                DisableErrorSound = Options.DisableErrorSound,
+                EnableVectronConnect = Options.EnableVectronConnect,
+                SaveVectronConnectCredentials = Options.SaveVectronConnectCredentials,
+                VectronConnectId = Options.SaveVectronConnectCredentials ? Options.VectronConnectId : null,
+                VectronConnectPassword = Options.SaveVectronConnectCredentials ? Options.VectronConnectPassword : null,
+                SetTcpIpInterface19 = Options.SetTcpIpInterface19,
+                Interface19IpAddress = Options.Interface19IpAddress,
+                AddShift4TerminalToInterface18 = Options.AddShift4TerminalToInterface18,
             };
         }
 

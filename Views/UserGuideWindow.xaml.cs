@@ -134,12 +134,17 @@ namespace DumpLoader_2._0.Views
                 new FeatureItem
                 {
                     Title = "Automatic dump editing",
-                    Body = "When \"Automatic Dump Editing\" is switched on, VPOS Manager runs the dump through the third-party VPOS Dump Editor (DIG) before loading it, applying a chosen set of edits to a working copy — the original dump file is never touched. Available toggles: Disable print, Disable license check, Disable myVectron, Disable VectronConnect, Disable bonVito. Before DumpEditor.exe runs, the app also swaps in the VPP program file matching the selected VPOS version (VPP-{Version}.VPP from the configured VPP Path, copied in as VPOSPROG.DLL), so the dump is always edited with the correct version's program logic."
+                    Body = "When \"Automatic Dump Editing\" is switched on, VPOS Manager runs the dump through the third-party VPOS Dump Editor (DIG) before loading it, applying a chosen set of edits to a working copy — the original dump file is never touched. Available toggles: Disable print, Disable license check, Disable myVectron, Disable VectronConnect, Disable bonVito, Disable keyboard sound, Disable error sound. Before DumpEditor.exe runs, the app also swaps in the VPP program file matching the selected VPOS version (VPP-{Version}.VPP from the configured VPP Path, copied in as VPOSPROG.DLL), so the dump is always edited with the correct version's program logic."
                 },
                 new FeatureItem
                 {
-                    Title = "myVectron overrides",
-                    Body = "Bake a specific myVectron username/password into the dump before launch, and flip the Prod/Test switch to point VectronConnect and myVectron at the Test or Prod server environment. Check \"Save Username & Password\" to remember credentials between sessions (stored in plain text in settings.json)."
+                    Title = "myVectron & VectronConnect",
+                    Body = "Bake a specific myVectron username/password into the dump before launch, and flip the Prod/Test switch to point VectronConnect and myVectron at the Test or Prod server environment. Check \"Save credentials\" to remember them between sessions (stored in plain text in settings.json, with a one-time warning). Next to it, an independent \"VectronConnect\" section can enable VectronConnect outright with a Connect ID and VC Password, with its own matching \"Save credentials\" checkbox and warning - mutually exclusive with \"Disable VectronConnect\" above, since both configure the same underlying setting; automatic dump editing refuses to run if both are checked."
+                },
+                new FeatureItem
+                {
+                    Title = "Printer (TCP/IP) & PAX, Verifone and MobileApp",
+                    Body = "Check \"Set interface 20 to TCP/IP\" to register a TCP/IP interface named PRINTER (fixed port 9100) at the IPv4 address you enter - required and validated before any load-dump action runs while this is checked. With it on, \"Set all printers to this interface\" points all 10 printer driver slots at interface 20 with a programmed driver enabled, using a driver number (1-20, 20 by default) also validated before use. Separately, \"Set interface 19 to TCP/IP\" registers interface 19 (named TERMINAL, fixed port 8085) for PAX/Verifone/MobileApp routing at its own IPv4 address, and \"Add Shift4 Terminal to Interface 18 (for printing)\" retypes interface 18 for that purpose - no IP/port needed for that one."
                 },
                 new FeatureItem
                 {
@@ -186,12 +191,17 @@ namespace DumpLoader_2._0.Views
                 new FeatureItem
                 {
                     Title = "Automatische Dump-Bearbeitung",
-                    Body = "Wenn \"Automatic Dump Editing\" aktiviert ist, führt VPOS Manager den Dump vor dem Laden durch den Dump Editor (DIG) eines Drittanbieters und wendet eine gewählte Menge an Änderungen auf eine Arbeitskopie an — die Original-Dump-Datei wird dabei nie verändert. Verfügbare Schalter: Disable print, Disable license check, Disable myVectron, Disable VectronConnect, Disable bonVito. Bevor DumpEditor.exe ausgeführt wird, tauscht die App zusätzlich die zur gewählten VPOS-Version passende VPP-Programmdatei ein (VPP-{Version}.VPP aus dem konfigurierten VPP-Pfad, kopiert als VPOSPROG.DLL), sodass der Dump immer mit der korrekten Programmlogik der jeweiligen Version bearbeitet wird."
+                    Body = "Wenn \"Automatic Dump Editing\" aktiviert ist, führt VPOS Manager den Dump vor dem Laden durch den Dump Editor (DIG) eines Drittanbieters und wendet eine gewählte Menge an Änderungen auf eine Arbeitskopie an — die Original-Dump-Datei wird dabei nie verändert. Verfügbare Schalter: Disable print, Disable license check, Disable myVectron, Disable VectronConnect, Disable bonVito, Disable keyboard sound, Disable error sound. Bevor DumpEditor.exe ausgeführt wird, tauscht die App zusätzlich die zur gewählten VPOS-Version passende VPP-Programmdatei ein (VPP-{Version}.VPP aus dem konfigurierten VPP-Pfad, kopiert als VPOSPROG.DLL), sodass der Dump immer mit der korrekten Programmlogik der jeweiligen Version bearbeitet wird."
                 },
                 new FeatureItem
                 {
-                    Title = "myVectron-Überschreibungen",
-                    Body = "Hinterlegen Sie vor dem Start einen bestimmten myVectron-Benutzernamen/-Passwort im Dump, und schalten Sie mit dem Prod/Test-Schalter um, ob VectronConnect und myVectron auf die Test- oder Produktivumgebung zeigen. Aktivieren Sie \"Save Username & Password\", um die Zugangsdaten zwischen den Sitzungen zu speichern (im Klartext in settings.json)."
+                    Title = "myVectron & VectronConnect",
+                    Body = "Hinterlegen Sie vor dem Start einen bestimmten myVectron-Benutzernamen/-Passwort im Dump, und schalten Sie mit dem Prod/Test-Schalter um, ob VectronConnect und myVectron auf die Test- oder Produktivumgebung zeigen. Aktivieren Sie \"Save credentials\", um die Zugangsdaten zwischen den Sitzungen zu speichern (im Klartext in settings.json, mit einmaliger Warnung). Daneben kann ein eigenständiger Bereich \"VectronConnect\" VectronConnect direkt mit Connect ID und VC Password aktivieren, mit eigenem \"Save credentials\"-Kästchen und derselben Warnung — schließt sich mit \"Disable VectronConnect\" oben gegenseitig aus, da beide dieselbe zugrunde liegende Einstellung konfigurieren; die automatische Dump-Bearbeitung verweigert den Start, wenn beide aktiviert sind."
+                },
+                new FeatureItem
+                {
+                    Title = "Printer (TCP/IP) & PAX, Verifone and MobileApp",
+                    Body = "Aktivieren Sie \"Set interface 20 to TCP/IP\", um eine TCP/IP-Schnittstelle namens PRINTER (fest auf Port 9100) unter der eingegebenen IPv4-Adresse anzulegen — erforderlich und wird geprüft, bevor bei aktiviertem Kästchen irgendeine Lade-Aktion ausgeführt wird. Ist dies aktiviert, weist \"Set all printers to this interface\" allen 10 Druckertreiber-Plätzen Interface 20 zu und aktiviert den programmierten Treiber, mit einer Treibernummer (1-20, standardmäßig 20), die ebenfalls vor der Verwendung geprüft wird. Getrennt davon registriert \"Set interface 19 to TCP/IP\" Interface 19 (Name TERMINAL, fest auf Port 8085) für die Weiterleitung von PAX/Verifone/MobileApp unter einer eigenen IPv4-Adresse, und \"Add Shift4 Terminal to Interface 18 (for printing)\" richtet Interface 18 dafür um — dafür werden keine IP/Port benötigt."
                 },
                 new FeatureItem
                 {
@@ -221,6 +231,29 @@ namespace DumpLoader_2._0.Views
         {
             return new List<ChangelogEntry>
             {
+                new ChangelogEntry
+                {
+                    Title = "1.0.0 — VectronConnect, PAX/Verifone/MobileApp routing & sound toggles",
+                    Entries =
+                    {
+                        "Added \"Disable keyboard sound\" and \"Disable error sound\" to General Settings.",
+                        "Added an independent \"VectronConnect\" section (split 50/50 next to myVectron): a checkbox plus Connect ID and VC Password fields that enable VectronConnect outright. Mutually exclusive with \"Disable VectronConnect\" - both write to the same underlying setting, so automatic dump editing now refuses to run if both are checked, with an explanatory error.",
+                        "\"Interface 20 (TCP/IP)\" is now \"Printer (TCP/IP)\", split 50/50 with a new \"PAX, Verifone & MobileApp\" section: \"Set interface 19 to TCP/IP\" (fixed port 8085) plus its own IPv4 field, and \"Add Shift4 Terminal to Interface 18 (for printing)\" (no IP/port needed).",
+                        "Interface 20's port field was removed - it's now fixed at 9100 and shown as read-only text beside the IP field, matching interface 19's fixed-port treatment.",
+                        "The title bar now shows the copyright line (\"VPOS Manager © David Kopf · DIG © Volker Görgler\") and the app's version number, right-bound, read from the assembly version so it never needs to be hand-typed.",
+                        "Renamed myVectron's \"Save Username & Password\" checkbox to \"Save credentials\", and added a matching \"Save credentials\" checkbox (with the same one-time cleartext-storage warning) to the new VectronConnect section, gating its Connect ID/password persistence the same way.",
+                        "Interface 20's registered name (441/1/20/1) changed from VPOSMANAGER to PRINTER.",
+                    }
+                },
+                new ChangelogEntry
+                {
+                    Title = "0.9.1 — Interface 20 (TCP/IP) & printer driver editing",
+                    Entries =
+                    {
+                        "Added \"Set interface 20 to TCP/IP\": registers a new TCP/IP interface named VPOSMANAGER at a chosen IPv4 address and port. Both fields are required and validated (valid IPv4, port 1-65535) before any load-dump action can run while automatic dump editing and this checkbox are on.",
+                        "Added \"Set all printers to this interface\" (only available while the interface checkbox above is on): points all 10 printers at interface 20 with a programmed driver enabled, using a driver number field (1-20, defaults to 20, also validated before use).",
+                    }
+                },
                 new ChangelogEntry
                 {
                     Title = "0.9.0 — App-wide error handling & crash safety",
@@ -371,6 +404,29 @@ namespace DumpLoader_2._0.Views
         {
             return new List<ChangelogEntry>
             {
+                new ChangelogEntry
+                {
+                    Title = "1.0.0 — VectronConnect, PAX/Verifone/MobileApp-Weiterleitung & Ton-Schalter",
+                    Entries =
+                    {
+                        "\"Disable keyboard sound\" und \"Disable error sound\" wurden zu General Settings hinzugefügt.",
+                        "Ein eigenständiger Bereich \"VectronConnect\" wurde hinzugefügt (50/50 neben myVectron aufgeteilt): ein Kästchen plus die Felder Connect ID und VC Password, die VectronConnect direkt aktivieren. Schließt sich mit \"Disable VectronConnect\" gegenseitig aus — beide schreiben in dieselbe zugrunde liegende Einstellung, sodass die automatische Dump-Bearbeitung jetzt den Start verweigert, wenn beide aktiviert sind, mit einer erklärenden Fehlermeldung.",
+                        "\"Interface 20 (TCP/IP)\" heißt jetzt \"Printer (TCP/IP)\" und ist 50/50 mit einem neuen Bereich \"PAX, Verifone & MobileApp\" aufgeteilt: \"Set interface 19 to TCP/IP\" (fest auf Port 8085) mit eigenem IPv4-Feld, und \"Add Shift4 Terminal to Interface 18 (for printing)\" (ohne IP/Port).",
+                        "Das Port-Feld von Interface 20 wurde entfernt — der Port ist jetzt fest auf 9100 gesetzt und wird als schreibgeschützter Text neben dem IP-Feld angezeigt, analog zur Behandlung des festen Ports bei Interface 19.",
+                        "Die Titelleiste zeigt jetzt rechtsbündig die Copyright-Zeile (\"VPOS Manager © David Kopf · DIG © Volker Görgler\") und die Versionsnummer der App, gelesen aus der Assembly-Version, sodass sie nie von Hand eingetragen werden muss.",
+                        "Das Kästchen \"Save Username & Password\" von myVectron wurde in \"Save credentials\" umbenannt, und ein passendes \"Save credentials\"-Kästchen (mit derselben einmaligen Klartext-Speicher-Warnung) wurde dem neuen VectronConnect-Bereich hinzugefügt, das die Persistenz von Connect ID/Passwort auf dieselbe Weise steuert.",
+                        "Der registrierte Name von Interface 20 (441/1/20/1) wurde von VPOSMANAGER zu PRINTER geändert.",
+                    }
+                },
+                new ChangelogEntry
+                {
+                    Title = "0.9.1 — Interface 20 (TCP/IP) & Druckertreiber-Bearbeitung",
+                    Entries =
+                    {
+                        "Neuer Schalter \"Set interface 20 to TCP/IP\": legt eine neue TCP/IP-Schnittstelle namens VPOSMANAGER unter einer gewählten IPv4-Adresse und einem Port an. Beide Felder sind erforderlich und werden geprüft (gültige IPv4, Port 1-65535), bevor bei aktivierter automatischer Dump-Bearbeitung und diesem Kästchen irgendeine Lade-Aktion ausgeführt werden kann.",
+                        "Neuer Schalter \"Set all printers to this interface\" (nur verfügbar, solange das Schnittstellen-Kästchen oben aktiviert ist): weist allen 10 Druckern Interface 20 zu und aktiviert den programmierten Treiber, mit einem Feld für die Treibernummer (1-20, standardmäßig 20), die ebenfalls vor der Verwendung geprüft wird.",
+                    }
+                },
                 new ChangelogEntry
                 {
                     Title = "0.9.0 — Fehlerbehandlung & Absturzsicherheit für die gesamte App",

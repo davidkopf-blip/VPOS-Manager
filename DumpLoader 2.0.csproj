@@ -14,6 +14,11 @@
     <Nullable>enable</Nullable>
     <AssemblyTitle>VPOS Manager</AssemblyTitle>
     <Product>VPOS Manager</Product>
+    <!-- Keep in sync with Package.appxmanifest's Identity/@Version and the README/User Guide
+         changelogs - this is what the title bar's version label reads at runtime. -->
+    <Version>1.0.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -64,15 +69,26 @@
       only in packaged (non-Debug) builds. Keep trimming off in all configurations.
     -->
     <PublishTrimmed>False</PublishTrimmed>
-    <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>False</GenerateTestArtifacts>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
-    <AppInstallerUri>C:\Users\david.kopf\source\Installer</AppInstallerUri>
+    <AppInstallerUri>C:\Users\david.kopf\source\Installer2</AppInstallerUri>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <!--
+      PackageCertificateKeyFile alone previously pinned every packaging target - including Store
+      submissions - to a local test cert whose Subject (CN=David Kopf) didn't match the Store's
+      associated Publisher (CN=932EC8A3-2CA6-48C1-888C-2A1CF594AF44), which is what caused the
+      "Invalid package publisher name" rejection on upload. GenerateTemporaryStoreCertificate=True
+      is the actual fix: it makes MSBuild generate a fresh certificate matching the associated
+      Store Publisher at package-build time for Store submissions, regardless of what (if
+      anything) the key file below contains - VS's own Create App Packages wizard adds this same
+      pair when targeting the Store.
+    -->
     <PackageCertificateKeyFile>DumpLoader 2.0_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
   </PropertyGroup>
 </Project>

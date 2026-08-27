@@ -17,7 +17,7 @@
         <!-- Custom title bar: replaces the native white caption area. Set as the drag region via
              Window.SetTitleBar in code-behind; OS min/max/close glyphs are recolored to render
              directly on top of this bar (see MainWindow.xaml.cs). -->
-        <Grid x:Name="AppTitleBar" Grid.Row="0" Height="40" Background="{StaticResource CardBackground}" ColumnDefinitions="Auto,*">
+        <Grid x:Name="AppTitleBar" Grid.Row="0" Height="40" Background="{StaticResource CardBackground}" ColumnDefinitions="Auto,*,Auto">
             <TextBlock Grid.Column="0" Text="VPOS Manager" Foreground="{StaticResource SecondaryText}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="16,0,24,0" />
             <MenuBar Grid.Column="1" Background="Transparent" VerticalAlignment="Center">
                 <MenuBarItem Title="Settings">
@@ -28,6 +28,13 @@
                     <MenuFlyoutItem Text="About VPOS Manager" Click="AboutMenuItem_Click" />
                 </MenuBarItem>
             </MenuBar>
+
+            <!-- Right-bound, clear of the OS caption buttons: copyright info on the left, version
+                 number on the right, both set from code-behind in the constructor. -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="0,0,140,0">
+                <TextBlock x:Name="CopyrightText" Foreground="{StaticResource MutedText}" FontSize="11.5" VerticalAlignment="Center" />
+                <TextBlock x:Name="VersionText" Foreground="{StaticResource MutedText}" FontSize="11.5" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1" Padding="24" ColumnDefinitions="60*,40*" ColumnSpacing="24">
@@ -73,7 +80,7 @@
 
                         <StackPanel Spacing="12">
                             <TextBlock Text="GENERAL SETTINGS" Style="{StaticResource SectionLabelStyle}" />
-                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
                                 <!-- Row 1 -->
                                 <CheckBox Content="Disable print" IsChecked="{Binding Options.DisablePrint, Mode=TwoWay}" Grid.Column="0" Grid.Row="0" />
                                 <CheckBox Content="Disable license check" IsChecked="{Binding Options.DisableLicenseCheck, Mode=TwoWay}" Grid.Column="1" Grid.Row="0" />
@@ -82,32 +89,95 @@
                                 <!-- Row 2 -->
                                 <CheckBox Content="Disable VectronConnect" IsChecked="{Binding Options.DisableVectronConnect, Mode=TwoWay}" Grid.Column="0" Grid.Row="1" />
                                 <CheckBox Content="Disable bonVito" IsChecked="{Binding Options.DisableBonVito, Mode=TwoWay}" Grid.Column="1" Grid.Row="1" />
+                                <CheckBox Content="Disable keyboard sound" IsChecked="{Binding Options.DisableKeyboardSound, Mode=TwoWay}" Grid.Column="2" Grid.Row="1" />
+
+                                <!-- Row 3 -->
+                                <CheckBox Content="Disable error sound" IsChecked="{Binding Options.DisableErrorSound, Mode=TwoWay}" Grid.Column="0" Grid.Row="2" />
                             </Grid>
                         </StackPanel>
 
                         <Rectangle Height="1" Fill="{StaticResource HairlineBrush}" />
 
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="MYVECTRON" Style="{StaticResource SectionLabelStyle}" />
+                        <!-- myVectron / VectronConnect: split 50/50 with a vertical hairline divider -->
+                        <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="20">
+                            <StackPanel Grid.Column="0" Spacing="12">
+                                <TextBlock Text="MYVECTRON" Style="{StaticResource SectionLabelStyle}" />
 
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
-                                <TextBlock Text="Prod" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
-                                <StackPanel Orientation="Horizontal" Spacing="0">
-                                    <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="40" />
-                                    <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="-6,0,0,0" />
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                                    <TextBlock Text="Prod" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                    <StackPanel Orientation="Horizontal" Spacing="0">
+                                        <ToggleSwitch IsOn="{Binding Options.IsTestServer, Mode=TwoWay}" OnContent="" OffContent="" MinWidth="40" />
+                                        <TextBlock Text="Test" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Margin="-6,0,0,0" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <CheckBox Content="mV Username" IsChecked="{Binding Options.MyVectronUsernameEnabled, Mode=TwoWay}" Width="168" />
+                                    <TextBox x:Name="MyVectronUsernameTextBox" Text="{Binding Options.MyVectronUsername, Mode=TwoWay}" Width="220" PlaceholderText="Username" IsEnabled="{Binding Options.MyVectronUsernameEnabled}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <CheckBox Content="mV Password" IsChecked="{Binding Options.MyVectronPasswordEnabled, Mode=TwoWay}" Width="168" />
+                                    <PasswordBox x:Name="MyVectronPasswordBox" Password="{Binding Options.MyVectronPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.MyVectronPasswordEnabled}" />
+                                </StackPanel>
+                                <CheckBox x:Name="SaveCredentialsCheckBox" Content="Save credentials" IsChecked="{Binding Options.SaveMyVectronCredentials, Mode=TwoWay}" Click="SaveCredentialsCheckBox_Click" />
+                            </StackPanel>
+
+                            <Rectangle Grid.Column="1" Width="1" Fill="{StaticResource HairlineBrush}" HorizontalAlignment="Center" />
+
+                            <StackPanel Grid.Column="2" Spacing="12">
+                                <TextBlock Text="VECTRONCONNECT" Style="{StaticResource SectionLabelStyle}" />
+
+                                <CheckBox Content="VectronConnect" IsChecked="{Binding Options.EnableVectronConnect, Mode=TwoWay}" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Connect ID" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Width="168" />
+                                    <TextBox x:Name="VectronConnectIdTextBox" Text="{Binding Options.VectronConnectId, Mode=TwoWay}" Width="220" PlaceholderText="91234567.vectron_connect" IsEnabled="{Binding Options.EnableVectronConnect}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="VC Password" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" Width="168" />
+                                    <PasswordBox x:Name="VectronConnectPasswordBox" Password="{Binding Options.VectronConnectPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.EnableVectronConnect}" />
+                                </StackPanel>
+                                <CheckBox x:Name="SaveVectronConnectCredentialsCheckBox" Content="Save credentials" IsChecked="{Binding Options.SaveVectronConnectCredentials, Mode=TwoWay}" Click="SaveVectronConnectCredentialsCheckBox_Click" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{StaticResource HairlineBrush}" />
+
+                        <!-- Printer (TCP/IP) / PAX, Verifone & MobileApp: split 50/50 with a vertical hairline divider -->
+                        <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="20">
+                            <StackPanel Grid.Column="0" Spacing="12">
+                                <TextBlock Text="PRINTER (TCP/IP)" Style="{StaticResource SectionLabelStyle}" />
+
+                                <CheckBox Content="Set interface 20 to TCP/IP" IsChecked="{Binding Options.SetTcpIpInterface20, Mode=TwoWay}" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBox x:Name="Interface20IpTextBox" Text="{Binding Options.Interface20IpAddress, Mode=TwoWay}" Width="160" PlaceholderText="192.168.1.100" IsEnabled="{Binding Options.SetTcpIpInterface20}" />
+                                    <TextBlock Text="PORT: 9100" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <CheckBox Content="Set all printers to this interface" IsChecked="{Binding Options.SetAllPrintersToInterface, Mode=TwoWay}" IsEnabled="{Binding Options.SetTcpIpInterface20}" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="Driver number (1-20)" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                    <TextBox x:Name="PrinterDriverNumberTextBox" Text="{Binding Options.PrinterDriverNumber, Mode=TwoWay}" Width="60" IsEnabled="{Binding Options.PrinterDriverFieldEnabled}" />
                                 </StackPanel>
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <CheckBox Content="mV Username" IsChecked="{Binding Options.MyVectronUsernameEnabled, Mode=TwoWay}" Width="168" />
-                                <TextBox x:Name="MyVectronUsernameTextBox" Text="{Binding Options.MyVectronUsername, Mode=TwoWay}" Width="220" PlaceholderText="Username" IsEnabled="{Binding Options.MyVectronUsernameEnabled}" />
+                            <Rectangle Grid.Column="1" Width="1" Fill="{StaticResource HairlineBrush}" HorizontalAlignment="Center" />
+
+                            <StackPanel Grid.Column="2" Spacing="12">
+                                <TextBlock Text="PAX, VERIFONE &amp; MOBILEAPP" Style="{StaticResource SectionLabelStyle}" />
+
+                                <CheckBox Content="Set interface 19 to TCP/IP" IsChecked="{Binding Options.SetTcpIpInterface19, Mode=TwoWay}" />
+
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBox x:Name="Interface19IpTextBox" Text="{Binding Options.Interface19IpAddress, Mode=TwoWay}" Width="160" PlaceholderText="192.168.1.100" IsEnabled="{Binding Options.SetTcpIpInterface19}" />
+                                    <TextBlock Text="PORT: 8085" Foreground="{StaticResource SecondaryText}" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <CheckBox Content="Add Shift4 Terminal to Interface 18 (for printing)" IsChecked="{Binding Options.AddShift4TerminalToInterface18, Mode=TwoWay}" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <CheckBox Content="mV Password" IsChecked="{Binding Options.MyVectronPasswordEnabled, Mode=TwoWay}" Width="168" />
-                                <PasswordBox x:Name="MyVectronPasswordBox" Password="{Binding Options.MyVectronPassword, Mode=TwoWay}" Width="220" PlaceholderText="Password" IsEnabled="{Binding Options.MyVectronPasswordEnabled}" />
-                            </StackPanel>
-                            <CheckBox x:Name="SaveCredentialsCheckBox" Content="Save Username &amp; Password" IsChecked="{Binding Options.SaveMyVectronCredentials, Mode=TwoWay}" Click="SaveCredentialsCheckBox_Click" />
-                        </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </Border>
             </Grid>
